@@ -1,0 +1,54 @@
+.titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #030710;
+  border-bottom: 1px solid #0a1e30;
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #378ADD;
+  box-shadow: 0 0 6px #378ADD;
+}
+
+.title {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #378ADD;
+  text-transform: uppercase;
+}
+
+.titlebar-right {
+  display: flex;
+  gap: 8px;
+  -webkit-app-region: no-drag;
+}
+
+.tb-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #0d2137;
+  border: 1px solid #1a3a55;
+  cursor: pointer;
+}
+
+.tb-btn:hover {
+  background: #f7e603;
+}
+
+.tb-btn.close:hover {
+  background: #7a1f1f;
+}
