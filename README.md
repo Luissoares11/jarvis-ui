@@ -1,1 +1,125 @@
-# jarvis-ui
+# Jarvis UI
+
+> Desktop interface for the Jarvis AI assistant — built with Electron + React.
+
+A cinematic, Iron Man-inspired desktop app that connects to the [Jarvis API](https://github.com/Luissoares11/jarvis) and gives it a full visual interface. Dark terminal aesthetic, live data panels, and a mini overlay mode for quick access from anywhere on the desktop.
+
+---
+
+## Features
+
+**Chat** — Full conversation interface with the Jarvis AI. Supports all natural language commands — memory, computation, weather, football, todos, reminders, calendar events, and more.
+
+**Live panels** — Sidebar panels showing real-time data: current weather, active tasks, pending reminders, and upcoming events. Auto-refreshes every 30 seconds.
+
+**Tasks & Reminders** — Dedicated page to manage your to-do list and set reminders with a clean UI, without typing commands.
+
+**Calendar** — View, add, and delete events. Toggle between upcoming and past events.
+
+**Memory** — Browse everything Jarvis knows — facts about you, people you've mentioned, relationships — grouped by entity and deletable in one click.
+
+**Settings** — Configure server URL, API token, and hotkey. Persisted locally across sessions.
+
+**Mini mode** — Press `Ctrl+Space` anywhere on the desktop to bring up a small floating input bar. Type a command, get a response, press `Escape` to dismiss. No need to open the full app.
+
+**System tray** — Closing the window minimizes to tray. Right-click for options, left-click to reopen.
+
+**Interactive plots** — Mathematical graphs rendered with Plotly — zoomable, pannable, hoverable.
+
+---
+
+## Stack
+
+| Layer | Tech |
+|---|---|
+| Framework | Electron + React + Vite |
+| Styling | Pure CSS — terminal aesthetic |
+| HTTP | Axios |
+| Plots | Plotly (via Jarvis API) |
+| Config | dotenv + persistent JSON via Electron IPC |
+| Packaging | electron-builder |
+
+---
+
+## Project structure
+
+```
+jarvis-ui/
+├── src/
+│   ├── components/
+│   │   ├── Titlebar.jsx     # custom frameless titlebar
+│   │   ├── Sidebar.jsx      # navigation
+│   │   ├── Chat.jsx         # main chat interface
+│   │   ├── Panels.jsx       # live data panels
+│   │   ├── Tasks.jsx        # tasks + reminders page
+│   │   ├── Calendar.jsx     # events page
+│   │   ├── Memory.jsx       # memory browser
+│   │   ├── Settings.jsx     # config page
+│   │   └── Mini.jsx         # mini overlay mode
+│   ├── styles/              # per-component CSS
+│   ├── api.js               # Jarvis API calls
+│   └── config.js            # dynamic config via Electron IPC
+├── electron.cjs             # Electron main process
+├── .env                     # local config (not committed)
+└── package.json
+```
+
+---
+
+## Setup
+
+Requires the [Jarvis API](https://github.com/Luissoares11/jarvis) running and accessible.
+
+```bash
+git clone https://github.com/Luissoares11/jarvis-ui.git
+cd jarvis-ui
+npm install
+```
+
+Create a `.env` file:
+```
+VITE_API_URL=http://your-server-ip:8000
+VITE_TOKEN=your_jarvis_token
+```
+
+Run in development:
+```bash
+npm run start
+```
+
+Build as a desktop app:
+```bash
+npm run build
+npx electron-builder
+```
+
+---
+
+## Hotkeys
+
+| Hotkey | Action |
+|---|---|
+| `Ctrl+Space` | Toggle mini mode overlay |
+| `Enter` | Send message |
+| `Escape` | Dismiss mini mode |
+
+---
+
+## Roadmap
+
+- [x] Chat interface
+- [x] Live data panels
+- [x] Tasks & reminders page
+- [x] Calendar page
+- [x] Memory browser
+- [x] Settings with persistence
+- [x] Mini mode overlay
+- [x] System tray
+- [x] Interactive plots
+- [ ] First-launch setup screen
+- [ ] Phone UI (React Native)
+- [ ] Voice input (Stage 11)
+
+---
+
+*Built by Luís Soares — part of the Jarvis project*
