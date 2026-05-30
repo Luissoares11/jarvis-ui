@@ -29,7 +29,17 @@ function Chat() {
         { message: text, session_id: config.SESSION_ID },
         { headers: { Authorization: `Bearer ${config.TOKEN}` } }
       )
-      setMessages(prev => [...prev, { role: 'jarvis', text: res.data.response }])
+
+      const response = res.data.response
+
+      if (response.startsWith('PLOT:')) {
+        const filename = response.replace('PLOT:', '')
+        const plotUrl = `${config.API_URL}/plots/${filename}`
+        setMessages(prev => [...prev, { role: 'jarvis', text: '📊 Graph ready.', plotUrl }])
+      } else {
+        setMessages(prev => [...prev, { role: 'jarvis', text: response }])
+      }
+
     } catch (err) {
       setMessages(prev => [...prev, { role: 'jarvis', text: 'Connection error, sir.' }])
     } finally {
@@ -52,7 +62,17 @@ function Chat() {
         {messages.map((msg, i) => (
           <div key={i} className={`msg ${msg.role}`}>
             <div className="msg-label">{msg.role === 'jarvis' ? 'Jarvis' : 'You'}</div>
-            <div className="msg-bubble">{msg.text}</div>
+            <div className="msg-bubble">
+              {msg.text}
+              {msg.plotUrl && (
+                <div
+                  className="plot-btn"
+                  onClick={() => window.open(msg.plotUrl, '_blank')}
+                >
+                  ▶ Open interactive graph
+                </div>
+              )}
+            </div>
           </div>
         ))}
         {loading && (

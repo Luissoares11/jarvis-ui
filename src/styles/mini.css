@@ -1,0 +1,53 @@
+.mini {
+  width: 100vw;
+  background: #050a0f;
+  border: 1px solid #378ADD;
+  border-radius: 8px;
+  overflow: hidden;
+  -webkit-app-region: drag;
+}
+
+.mini-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  -webkit-app-region: no-drag;
+}
+
+.mini-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #378ADD;
+  box-shadow: 0 0 6px #378ADD;
+  flex-shrink: 0;
+}
+
+.mini-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #378ADD;
+  letter-spacing: 1px;
+}
+
+.mini-input::placeholder {
+  color: #1a3a55;
+}
+
+.mini-response {
+  padding: 8px 16px 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #70b8f0;
+  letter-spacing: 0.5px;
+  white-space: pre-wrap;
+  border-top: 1px solid #0a1e30;
+  max-height: 200px;
+  overflow-y: auto;
+  -webkit-app-region: no-drag;
+}
