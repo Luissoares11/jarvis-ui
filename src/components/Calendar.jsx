@@ -17,7 +17,7 @@ function Calendar() {
   const [showPast, setShowPast] = useState(false)
 
     const fetchEvents = async () => {
-        const res = await sendMessage(showPast ? 'show my past events' : 'show all my events')
+        const res = await sendMessage(showPast ? 'show my past events' : 'show all my events', 'panels')
         parseEvents(res)
     }
 

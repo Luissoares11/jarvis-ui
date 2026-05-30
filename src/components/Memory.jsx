@@ -8,7 +8,7 @@ function Memory() {
 
   const fetchMemory = async () => {
     setLoading(true)
-    const res = await sendMessage('jarvis facts')
+    const res = await sendMessage('jarvis facts', 'panels')
     parseFacts(res)
     setLoading(false)
   }

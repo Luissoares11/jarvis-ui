@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { sendMessage as sendToJarvis } from '../api'
-import axios from 'axios'
-import config from '../config'
+import { getConfig } from '../config'
 import '../styles/chat.css'
 
 function Chat({ messages, setMessages }) {
@@ -16,16 +15,11 @@ function Chat({ messages, setMessages }) {
   const sendMessage = async () => {
     const text = input.trim()
     if (!text || loading) return
-
-    const response = await sendToJarvis(text)
-
-    if (response.startsWith('PLOT:')) {
-      const filename = response.replace('PLOT:', '')
-      const config = await import('../config').then(m => m.getConfig())
-      const plotUrl = `${config.apiUrl}/plots/${filename}`
-      setMessages(prev => [...prev, { role: 'jarvis', text: '📊 Graph ready.', plotUrl }])
-    } else {
-      setMessages(prev => [...prev, { role: 'jarvis', text: response }])
+    
+    if (text.toLowerCase() === 'clear') {
+      setInput('')
+      setMessages([{ role: 'jarvis', text: 'Online and ready, sir.' }])
+      return
     }
 
     setInput('')
@@ -33,17 +27,12 @@ function Chat({ messages, setMessages }) {
     setLoading(true)
 
     try {
-      const res = await axios.post(
-        `${config.API_URL}/chat`,
-        { message: text, session_id: config.SESSION_ID },
-        { headers: { Authorization: `Bearer ${config.TOKEN}` } }
-      )
-
-      const response = res.data.response
+      const response = await sendToJarvis(text)
 
       if (response.startsWith('PLOT:')) {
         const filename = response.replace('PLOT:', '')
-        const plotUrl = `${config.API_URL}/plots/${filename}`
+        const config = await getConfig()
+        const plotUrl = `${config.apiUrl}/plots/${filename}`
         setMessages(prev => [...prev, { role: 'jarvis', text: '📊 Graph ready.', plotUrl }])
       } else {
         setMessages(prev => [...prev, { role: 'jarvis', text: response }])

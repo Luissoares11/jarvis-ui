@@ -74,10 +74,10 @@ function Panels() {
   const refresh = async () => {
     try {
       const [w, t, r, e] = await Promise.all([
-        sendMessage('weather in Porto'),
-        sendMessage('show my tasks'),
-        sendMessage('show reminders'),
-        sendMessage('show my events'),
+        sendMessage('weather in Castelo de Paiva', 'panels'),
+        sendMessage('show my tasks', 'panels'),
+        sendMessage('show reminders', 'panels'),
+        sendMessage('show my events', 'panels'),
       ])
       setWeather(parseWeather(w))
       setTodos(parseTodos(t))
@@ -91,7 +91,7 @@ function Panels() {
 
   useEffect(() => {
     refresh()
-    const interval = setInterval(refresh, 60000) // refresh every minute
+    const interval = setInterval(refresh, 60000)// refresh every 1 minute
     return () => clearInterval(interval)
   }, [])
 

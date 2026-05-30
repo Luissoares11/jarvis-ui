@@ -13,8 +13,8 @@ function Tasks() {
 
   const fetchAll = async () => {
     const [todoRes, reminderRes] = await Promise.all([
-      sendMessage('show my tasks'),
-      sendMessage('show reminders'),
+      sendMessage('show my tasks', 'panels'),
+      sendMessage('show reminders', 'panels'),
     ])
     parseTodos(todoRes)
     parseReminders(reminderRes)
@@ -79,6 +79,11 @@ function Tasks() {
     await fetchAll()
     setLoading(false)
   }
+
+  const deleteReminder = async (message) => {
+    await sendMessage(`delete reminder ${message}`)
+    await fetchAll()
+    }
 
   useEffect(() => { fetchAll() }, [])
 
@@ -147,6 +152,7 @@ function Tasks() {
               <div className="reminder-icon">⏰</div>
               <div className="reminder-text">{r.message}</div>
               <div className="reminder-time">{r.time}</div>
+              <div className="todo-delete" onClick={() => deleteReminder(r.message)}>✕</div>
             </div>
           ))}
         </div>
