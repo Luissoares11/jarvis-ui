@@ -1,11 +1,10 @@
 import '../styles/sidebar.css'
 
 const navItems = [
-  { id: 'chat',      label: 'Chat',      count: null },
-  { id: 'tasks',     label: 'Tasks',     count: null },
-  { id: 'reminders', label: 'Reminders', count: null },
-  { id: 'calendar',  label: 'Calendar',  count: null },
-  { id: 'memory',    label: 'Memory',    count: null },
+  { id: 'chat',     label: 'Chat',     count: null },
+  { id: 'tasks',    label: 'Tasks',    count: null },
+  { id: 'calendar', label: 'Calendar', count: null },
+  { id: 'memory',   label: 'Memory',   count: null },
 ]
 
 const systemItems = [

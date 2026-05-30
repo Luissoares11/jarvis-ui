@@ -12,8 +12,8 @@ function Titlebar() {
         <span className="title">Jarvis — v1.0</span>
       </div>
       <div className="titlebar-right">
-        <div className="tb-btn" onClick={handleMinimize} />
-        <div className="tb-btn" onClick={handleMaximize} />
+        <div className="tb-btn min" onClick={handleMinimize} />
+        <div className="tb-btn max" onClick={handleMaximize} />
         <div className="tb-btn close" onClick={handleClose} />
       </div>
     </div>

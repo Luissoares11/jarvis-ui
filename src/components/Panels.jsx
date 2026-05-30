@@ -97,6 +97,7 @@ function Panels() {
 
   return (
     <div className="panel-area">
+      <div className="panel-refresh" onClick={refresh}>↻ refresh</div>
       <PanelCard title="Weather" items={weather} />
       <PanelCard title="Tasks"   items={todos} />
       <PanelCard title="Reminders" items={reminders} />

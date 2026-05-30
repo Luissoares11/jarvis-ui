@@ -1,0 +1,57 @@
+.memory-refresh {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #1e4d6b;
+  text-transform: uppercase;
+  text-align: right;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-bottom: 16px;
+  transition: color 0.15s ease;
+}
+
+.memory-refresh:hover {
+  color: #378ADD;
+}
+
+.memory-group {
+  margin-bottom: 20px;
+}
+
+.memory-group-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #378ADD;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #0a1e30;
+}
+
+.memory-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #071828;
+  border: 1px solid #0d2a40;
+  border-radius: 4px;
+  border-left: 2px solid #378ADD;
+  margin-bottom: 6px;
+}
+
+.memory-relation {
+  font-size: 11px;
+  color: #1e4d6b;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.memory-value {
+  flex: 1;
+  font-size: 13px;
+  color: #70b8f0;
+  letter-spacing: 0.5px;
+}

@@ -1,9 +1,36 @@
 const { app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain } = require('electron')
 const path = require('path')
+const fs = require('fs')
+
+const CONFIG_PATH = path.join(app.getPath('userData'), 'jarvis-config.json')
 
 let mainWindow
 let miniWindow
 let tray
+
+function loadConfig() {
+  try {
+    if (fs.existsSync(CONFIG_PATH)) {
+      return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'))
+    }
+  } catch {}
+  return {
+    apiUrl: process.env.VITE_API_URL || '',
+    token: process.env.VITE_TOKEN || '',
+    hotkey: 'CommandOrControl+Space',
+  }
+}
+
+function saveConfig(config) {
+  fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2))
+}
+
+// add these IPC handlers inside app.whenReady():
+ipcMain.handle('get-config', () => loadConfig())
+ipcMain.handle('save-config', (event, config) => {
+  saveConfig(config)
+  return true
+})
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({

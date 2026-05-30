@@ -45,10 +45,14 @@
   cursor: pointer;
 }
 
-.tb-btn:hover {
+.tb-btn.min:hover {
+  background: #03f7f7;
+}
+
+.tb-btn.max:hover {
   background: #f7e603;
 }
 
 .tb-btn.close:hover {
-  background: #7a1f1f;
+  background: #c21010;
 }
