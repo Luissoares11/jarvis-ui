@@ -99,7 +99,7 @@ npx electron-builder
 
 | Hotkey | Action |
 |---|---|
-| `Ctrl+Space` | Toggle mini mode overlay |
+| `Ctrl+Shift+J` | Toggle mini mode overlay |
 | `Enter` | Send message |
 | `Escape` | Dismiss mini mode |
 

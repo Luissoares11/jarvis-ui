@@ -72,7 +72,7 @@ function createMiniWindow() {
 
   miniWindow.loadURL('http://localhost:5173/#mini')
   miniWindow.hide()
-  mainWindow.webContents.openDevTools()
+
   miniWindow.on('blur', () => {
     miniWindow.hide()
   })
