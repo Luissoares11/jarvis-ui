@@ -7,6 +7,8 @@ const CONFIG_PATH = path.join(app.getPath('userData'), 'jarvis-config.json')
 let mainWindow
 let miniWindow
 let tray
+let cardWindow
+
 
 function loadConfig() {
   try {
@@ -94,12 +96,32 @@ function createTray() {
   })
 }
 
+function createCardWindow() {
+    cardWindow = new BrowserWindow({
+      width: 340,
+      height: 400,
+      frame: false,
+      transparent: true,
+      alwaysOnTop: true,
+      skipTaskbar: true,
+      resizable: false,
+      show: false,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      },
+    })
+
+    cardWindow.loadURL('http://localhost:5173/#card')
+  }
+
 app.whenReady().then(() => {
   createMainWindow()
   createMiniWindow()
   createTray()
+  createCardWindow()
 
-  globalShortcut.register('CommandOrControl+Space', () => {
+  globalShortcut.register('CommandOrControl+Shift+J', () => {
     if (miniWindow.isVisible()) {
       miniWindow.hide()
     } else {
@@ -127,3 +149,28 @@ ipcMain.on('resize-mini', (event, height) => {
     miniWindow.setSize(500, Math.min(height, 400))
   }
 })
+
+ipcMain.on('show-card', (event, { data, type }) => {
+  console.log('show-card received:', type, JSON.stringify(data).slice(0, 100))
+  if (!cardWindow) {
+    console.log('cardWindow is null!')
+    return
+  }
+
+  // position it above the mini bar
+  const miniPos = miniWindow.getPosition()
+  const miniSize = miniWindow.getSize()
+  cardWindow.setPosition(miniPos[0], miniPos[1] - 420)
+  cardWindow.webContents.send('card-data', { data, type })
+  cardWindow.show()
+  cardWindow.focus()
+})
+
+ipcMain.on('hide-card', () => {
+  if (cardWindow) cardWindow.hide()
+})
+
+ipcMain.on('resize-card', (event, height) => {
+  if (cardWindow) cardWindow.setSize(340, Math.min(height + 2, 600))
+})
+

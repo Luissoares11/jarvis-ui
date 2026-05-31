@@ -10,6 +10,7 @@ import Tasks from './components/Tasks'
 import Calendar from './components/Calendar'
 import Memory from './components/Memory'
 import Settings from './components/Settings'
+import Card from './components/Card'
 import './styles/app.css'
 
 function App() {
@@ -20,6 +21,9 @@ function App() {
 
   const isMini = window.location.hash === '#mini'
   if (isMini) return <Mini />
+
+  const isCard = window.location.hash === '#card'
+  if (isCard) return <Card />
 
   const renderPage = () => {
     switch (activePage) {
@@ -33,22 +37,22 @@ function App() {
   const [toasts, setToasts] = useState([])
 
     const playNotificationSound = () => {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)()
-    
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    
-    osc.frequency.setValueAtTime(880, ctx.currentTime)
-    osc.frequency.setValueAtTime(660, ctx.currentTime + 0.1)
-    
-    gain.gain.setValueAtTime(0.3, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
-    
-    osc.start(ctx.currentTime)
-    osc.stop(ctx.currentTime + 0.4)
+      const ctx = new (window.AudioContext || window.webkitAudioContext)()
+      
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      
+      osc.frequency.setValueAtTime(880, ctx.currentTime)
+      osc.frequency.setValueAtTime(660, ctx.currentTime + 0.1)
+      
+      gain.gain.setValueAtTime(0.3, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
+      
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 0.4)
   }
 
   useEffect(() => {
