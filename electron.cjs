@@ -72,7 +72,7 @@ function createMiniWindow() {
 
   miniWindow.loadURL('http://localhost:5173/#mini')
   miniWindow.hide()
-
+  mainWindow.webContents.openDevTools()
   miniWindow.on('blur', () => {
     miniWindow.hide()
   })
@@ -113,6 +113,7 @@ function createCardWindow() {
     })
 
     cardWindow.loadURL('http://localhost:5173/#card')
+
   }
 
 app.whenReady().then(() => {
@@ -173,4 +174,3 @@ ipcMain.on('hide-card', () => {
 ipcMain.on('resize-card', (event, height) => {
   if (cardWindow) cardWindow.setSize(340, Math.min(height + 2, 600))
 })
-

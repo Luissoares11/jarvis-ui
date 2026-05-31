@@ -1,60 +1,143 @@
-.event-input-grid {
-  display: grid;
-  grid-template-columns: 1fr 130px 90px 120px auto;
+.cal-nav {
+  display: flex;
+  align-items: center;
   gap: 10px;
   margin-bottom: 16px;
 }
 
-.calendar-toggle {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 16px;
+.cal-select {
+  background: #071828;
+  border: 1px solid #0d2a40;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #378ADD;
+  letter-spacing: 1px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease;
 }
 
-.toggle-btn {
-  font-size: 10px;
+.cal-select:hover {
+  border-color: #378ADD;
+}
+
+.cal-select:focus {
+  border-color: #378ADD;
+}
+
+.cal-select option {
+  background: #071828;
+  color: #378ADD;
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  justify-content: center;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 40px);
+  gap: 2px;
+  margin-bottom: 20px;
+}
+
+.cal-day-header {
+  font-size: 12px;
   letter-spacing: 2px;
   color: #1e4d6b;
   text-transform: uppercase;
-  padding: 5px 12px;
+  text-align: center;
+  padding: 6px 0;
+  width: 40px;
+}
+
+.cal-cell {
+  width: 40px;
+  height: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   border-radius: 4px;
+  cursor: default;
+  position: relative;
+  gap: 1px;
+  padding: 1px;
+}
+
+.cal-cell.active {
   cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.15s ease;
+  transition: background 0.15s ease;
 }
 
-.toggle-btn:hover {
-  color: #378ADD;
-}
-
-.toggle-btn.active {
-  color: #378ADD;
-  border-color: #0d2a40;
+.cal-cell.active:hover {
   background: #071828;
+}
+
+.cal-cell.today .cal-day-num {
+  color: #378ADD;
+  font-weight: bold;
+}
+
+.cal-cell.selected {
+  background: #071828;
+  border: 1px solid #378ADD;
+}
+
+.cal-day-num {
+  font-size: 19px;
+  color: #2e6a8f;
+}
+
+.cal-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #378ADD;
+  box-shadow: 0 0 4px #378ADD;
+}
+
+.cal-day-panel {
+  background: #071828;
+  border: 1px solid #0d2a40;
+  border-radius: 4px;
+  border-left: 2px solid #378ADD;
+  padding: 14px 16px;
+}
+
+.cal-day-panel-title {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #378ADD;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.event-input-grid {
+  display: grid;
+  grid-template-columns: 1fr 90px 120px auto;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .event-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  overflow-y: auto;
-}
-
-.event-list::-webkit-scrollbar {
-  width: 4px;
-}
-
-.event-list::-webkit-scrollbar-thumb {
-  background: #0d2a40;
-  border-radius: 2px;
 }
 
 .event-item {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 12px 16px;
-  background: #071828;
+  padding: 10px 14px;
+  background: #050a0f;
   border: 1px solid #0d2a40;
   border-radius: 4px;
   border-left: 2px solid #1d9e75;
@@ -65,11 +148,25 @@
   color: #1d9e75;
   letter-spacing: 1px;
   flex-shrink: 0;
-  min-width: 110px;
+  min-width: 50px;
 }
 
 .event-title {
+  flex: 1;
   font-size: 13px;
   color: #70b8f0;
   letter-spacing: 0.5px;
+}
+
+select.page-input option {
+  background: #071828;
+  color: #378ADD;
+}
+
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 24px;
 }
