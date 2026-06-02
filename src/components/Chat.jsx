@@ -1,16 +1,27 @@
 import { useState, useRef, useEffect } from 'react'
-import { sendMessage as sendToJarvis } from '../api'
+import { sendMessage as sendToJarvis, pingApi } from '../api'
 import { getConfig } from '../config'
 import '../styles/chat.css'
 
 function Chat({ messages, setMessages }) {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [connected, setConnected] = useState(false)
   const bottomRef = useRef(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    const check = async () => setConnected(await pingApi())
+    
+    check()
+    const interval = setInterval(check, 30000)
+    
+    window.addEventListener('focus', check)
+    
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('focus', check)
+    }
+  }, [])
 
   const sendMessage = async () => {
     const text = input.trim()
@@ -52,8 +63,10 @@ function Chat({ messages, setMessages }) {
   return (
     <div className="chat-area">
       <div className="chat-header">
-        <div className="status-dot" />
-        <span className="status-text">Online — Jarvis API connected</span>
+        <div className={`status-dot ${connected ? 'connected' : 'disconnected'}`} />
+        <span className={`status-text ${connected ? 'connected' : 'disconnected'}`}>
+          {connected ? 'Online — Jarvis API connected' : 'Offline — API unreachable'}
+        </span>
       </div>
 
       <div className="messages">

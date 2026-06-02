@@ -29,21 +29,28 @@ function Calendar() {
     parseEvents(res)
   }
 
+  const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
   const parseEvents = (response) => {
-    if (response.includes('No events')) {
+    if (!response || response.includes('No events')) {
       setEvents([])
       return
     }
+
     const lines = response.split('\n').filter(l => l.startsWith('  -'))
+
     setEvents(lines.map((line, i) => {
-      const match = line.match(/(\d{2}) (\w+) (\d{2}:\d{2}) — (.+)/)
-      return match ? {
+      const match = line.match(/(\d{2}) (\w+) (\d{4}) (\d{2}:\d{2}) — (.+)/)
+      if (!match) return null
+
+      return {
         id: i,
         day: parseInt(match[1]),
-        month: MONTHS.indexOf(match[2]),
-        time: match[3],
-        title: match[4].trim(),
-      } : null
+        month: MONTH_ABBR.indexOf(match[2]),
+        year: parseInt(match[3]),
+        time: match[4],
+        title: match[5].replace(/^[^\w]+/, '').trim(),
+      }
     }).filter(Boolean))
   }
 
@@ -80,7 +87,8 @@ function Calendar() {
   const getEventsForDay = (day) => {
     return events.filter(e =>
       e.day === day &&
-      e.month === currentDate.getMonth()
+      e.month === currentDate.getMonth() &&
+      e.year === currentDate.getFullYear()
     )
   }
 

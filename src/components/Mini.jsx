@@ -1,8 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
-import { sendMessage } from '../api'
+import { sendMessage, getTimers } from '../api'
 import '../styles/mini.css'
 
 const { ipcRenderer } = window.require('electron')
+
+function formatTime(seconds) {
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = seconds % 60
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+}
 
 function detectType(response) {
   if (response.startsWith('Currently in') || response.startsWith('Weather forecast')) return 'weather'
@@ -115,6 +123,36 @@ function Mini() {
       setInput('')
     }
   }
+
+  const prevTimerIds = useRef([])
+
+  useEffect(() => {
+    const fetchTimers = async () => {
+      const data = await getTimers()
+      const ids = data.map(t => t.id).join(',')
+      const prevIds = prevTimerIds.current.join(',')
+      
+      if (data.length > 0 && ids !== prevIds) {
+        prevTimerIds.current = data.map(t => t.id)
+        ipcRenderer.send('show-card', { data, type: 'timers' })
+      } else if (data.length === 0 && prevIds !== '') {
+        prevTimerIds.current = []
+        ipcRenderer.send('hide-card')
+      }
+    }
+
+    // only poll when mini is visible
+    let interval
+    ipcRenderer.on('mini-shown', () => {
+      fetchTimers()
+      interval = setInterval(fetchTimers, 5000)
+    })
+    ipcRenderer.on('mini-hidden', () => {
+      clearInterval(interval)
+    })
+
+    return () => clearInterval(interval)
+  }, [])
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') sendMsg()

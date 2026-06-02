@@ -97,24 +97,23 @@ function createTray() {
 }
 
 function createCardWindow() {
-    cardWindow = new BrowserWindow({
-      width: 340,
-      height: 400,
-      frame: false,
-      transparent: true,
-      alwaysOnTop: true,
-      skipTaskbar: true,
-      resizable: false,
-      show: false,
-      webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
-      },
-    })
+  cardWindow = new BrowserWindow({
+    width: 340,
+    height: 400,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    resizable: true,
+    show: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  })
 
-    cardWindow.loadURL('http://localhost:5173/#card')
-
-  }
+  cardWindow.loadURL('http://localhost:5173/#card')
+}
 
 app.whenReady().then(() => {
   createMainWindow()
@@ -125,6 +124,7 @@ app.whenReady().then(() => {
   globalShortcut.register('CommandOrControl+Shift+J', () => {
     if (miniWindow.isVisible()) {
       miniWindow.hide()
+      miniWindow.webContents.send('mini-hidden')
     } else {
       const { screen } = require('electron')
       const cursor = screen.getCursorScreenPoint()
@@ -135,6 +135,7 @@ app.whenReady().then(() => {
       miniWindow.setPosition(x, y)
       miniWindow.show()
       miniWindow.focus()
+      miniWindow.webContents.send('mini-shown')
     }
   })
 })
@@ -152,19 +153,17 @@ ipcMain.on('resize-mini', (event, height) => {
 })
 
 ipcMain.on('show-card', (event, { data, type }) => {
-  console.log('show-card received:', type, JSON.stringify(data).slice(0, 100))
-  if (!cardWindow) {
-    console.log('cardWindow is null!')
-    return
-  }
+  if (!cardWindow) return
 
-  // position it above the mini bar
   const miniPos = miniWindow.getPosition()
-  const miniSize = miniWindow.getSize()
   cardWindow.setPosition(miniPos[0], miniPos[1] - 420)
-  cardWindow.webContents.send('card-data', { data, type })
   cardWindow.show()
   cardWindow.focus()
+  
+  // send data after window is shown
+  setTimeout(() => {
+    cardWindow.webContents.send('card-data', { data, type })
+  }, 50)
 })
 
 ipcMain.on('hide-card', () => {

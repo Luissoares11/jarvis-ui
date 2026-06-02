@@ -18,15 +18,26 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #1d9e75;
-  box-shadow: 0 0 5px #1d9e75;
+}
+
+.status-dot.connected {
+  background: #1d9e75; 
+}
+
+.status-dot.disconnected {
+  background: #ff4444;
 }
 
 .status-text {
   font-size: 10px;
   letter-spacing: 2px;
-  color: #1d9e75;
   text-transform: uppercase;
+}
+.status-text.disconnected {
+  color: #ff4444;
+}
+.status-text.connected {
+  color: #1d9e75;
 }
 
 .messages {
@@ -191,3 +202,4 @@
   background: #378ADD;
   color: #050a0f;
 }
+

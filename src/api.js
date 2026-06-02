@@ -10,3 +10,39 @@ export async function sendMessage(message, sessionId = 'desktop') {
   )
   return res.data.response
 }
+
+export async function pingApi() {
+  try {
+    const config = await getConfig()
+    console.log('PING CONFIG:', config)
+    const url = `${config.apiUrl}/health`
+    console.log('PING URL:', url)
+    const res = await axios.get(
+      url,
+      { 
+        headers: { Authorization: `Bearer ${config.token}` },
+        timeout: 3000
+      }
+    )
+    console.log('PING RESULT:', res.status, res.data)
+    return true
+  } catch (err) {
+    console.log('PING ERROR:', err.message)
+    return false
+  }
+}
+
+export async function getTimers() {
+  try {
+    const config = await getConfig()
+    if (!config.apiUrl || !config.token) return []
+    const res = await axios.get(`${config.apiUrl}/timers`, {
+      headers: { Authorization: `Bearer ${config.token}` }
+    })
+    console.log('TIMERS:', res.data)
+    return res.data.timers
+  } catch (err) {
+    console.log('TIMERS ERROR:', err.message)
+    return []
+  }
+}

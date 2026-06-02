@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { sendMessage } from '../api'
+import TimerDisplay from './TimerDisplay'
 import '../styles/panels.css'
 
 function PanelCard({ title, items }) {
@@ -102,6 +103,7 @@ function Panels() {
       <PanelCard title="Tasks"   items={todos} />
       <PanelCard title="Reminders" items={reminders} />
       <PanelCard title="Events"  items={events} />
+      <TimerDisplay />
     </div>
   )
 }

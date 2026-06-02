@@ -3,16 +3,26 @@ import '../styles/card.css'
 
 const { ipcRenderer } = window.require('electron')
 
+function formatTime(seconds) {
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = seconds % 60
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+}
+
 function Card() {
   const [type, setType] = useState(null)
   const [data, setData] = useState(null)
   const containerRef = useRef(null)
 
   useEffect(() => {
-    ipcRenderer.on('card-data', (event, { data, type }) => {
+    const handler = (event, { data, type }) => {
       setType(type)
       setData(data)
-    })
+    }
+    ipcRenderer.on('card-data', handler)
+    return () => ipcRenderer.removeListener('card-data', handler)
   }, [])
 
   useEffect(() => {
@@ -24,6 +34,14 @@ function Card() {
 
   const close = () => ipcRenderer.send('hide-card')
 
+  const [now, setNow] = useState(Date.now())
+
+  useEffect(() => {
+    if (type !== 'timers') return
+    const interval = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(interval)
+  }, [type])
+
   if (!data) return null
 
   return (
@@ -33,7 +51,7 @@ function Card() {
         <span className="card-close" onClick={close}>✕</span>
       </div>
       <div className="card-body">
-        {renderContent(type, data)}
+        {renderContent(type, data, now)}
       </div>
     </div>
   )
@@ -46,11 +64,12 @@ function getTitle(type) {
     reminders: '// reminders',
     events: '// events',
     compute: '// result',
+    timers: '// timers',
   }
   return titles[type] || '// jarvis'
 }
 
-function renderContent(type, data) {
+function renderContent(type, data, now) {
   if (type === 'weather') {
     return (
       <div className="card-items">
@@ -117,6 +136,25 @@ function renderContent(type, data) {
       <div className="card-compute">
         <div className="card-result">{data.result}</div>
         {data.input && <div className="card-input-echo">{data.input}</div>}
+      </div>
+    )
+  }
+
+  if (type === 'timers') {
+    return (
+      <div className="card-items">
+        {data.length === 0
+          ? <div className="card-empty">No active timers, sir.</div>
+          : data.map((item, i) => {
+            const remaining = Math.max(0, Math.floor((new Date(item.ends_at) - now) / 1000))
+            return (
+              <div key={i} className="card-item">
+                <span className="card-label">⏱ {item.label}</span>
+                <span className="card-value">{formatTime(remaining)}</span>
+              </div>
+            )
+          })
+        }
       </div>
     )
   }
