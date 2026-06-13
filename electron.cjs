@@ -31,6 +31,7 @@ function saveConfig(config) {
 ipcMain.handle('get-config', () => loadConfig())
 ipcMain.handle('save-config', (event, config) => {
   saveConfig(config)
+  registerHotkey(config.hotkey || 'CommandOrControl+Space')
   return true
 })
 
@@ -45,9 +46,14 @@ function createMainWindow() {
       contextIsolation: false,
     },
   })
-
-  mainWindow.loadURL('http://localhost:5173')
-
+  
+  if (app.isPackaged || process.env.NODE_ENV === 'production') {
+    mainWindow.loadFile(path.join(__dirname, 'dist/index.html'))
+    mainWindow.once('ready-to-show', () => mainWindow.show()) 
+  } else {
+    mainWindow.loadURL('http://localhost:5173')
+  }
+  
   mainWindow.on('close', (e) => {
     e.preventDefault()
     mainWindow.hide()
@@ -70,7 +76,12 @@ function createMiniWindow() {
     },
   })
 
+  if (app.isPackaged || process.env.NODE_ENV === 'production') {
+  miniWindow.loadFile(path.join(__dirname, 'dist/index.html'), { hash: 'mini' })
+} else {
   miniWindow.loadURL('http://localhost:5173/#mini')
+}
+
   miniWindow.hide()
 
   miniWindow.on('blur', () => {
@@ -79,7 +90,11 @@ function createMiniWindow() {
 }
 
 function createTray() {
-  tray = new Tray(path.join(__dirname, 'src/assets/tray-icon.png'))
+  const iconPath = app.isPackaged
+    ? path.join(process.resourcesPath, 'tray-icon.png')
+    : path.join(__dirname, 'src/assets/tray-icon.png')
+
+  tray = new Tray(iconPath)
 
   const menu = Menu.buildFromTemplate([
     { label: 'Open Jarvis', click: () => { mainWindow.show(); mainWindow.focus() } },
@@ -112,7 +127,11 @@ function createCardWindow() {
     },
   })
 
+  if (app.isPackaged || process.env.NODE_ENV === 'production') {
+  cardWindow.loadFile(path.join(__dirname, 'dist/index.html'), { hash: 'card' })
+} else {
   cardWindow.loadURL('http://localhost:5173/#card')
+}
 }
 
 app.whenReady().then(() => {
@@ -121,7 +140,13 @@ app.whenReady().then(() => {
   createTray()
   createCardWindow()
 
-  globalShortcut.register('CommandOrControl+Shift+J', () => {
+  const config = loadConfig()
+  registerHotkey(config.hotkey || 'CommandOrControl+Space')
+})
+
+function registerHotkey(hotkey) {
+  globalShortcut.unregisterAll()
+  globalShortcut.register(hotkey, () => {
     if (miniWindow.isVisible()) {
       miniWindow.hide()
       miniWindow.webContents.send('mini-hidden')
@@ -138,7 +163,7 @@ app.whenReady().then(() => {
       miniWindow.webContents.send('mini-shown')
     }
   })
-})
+}
 
 app.on('window-all-closed', () => {})
 
