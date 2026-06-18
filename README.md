@@ -116,9 +116,14 @@ npx electron-builder
 - [x] Mini mode overlay
 - [x] System tray
 - [x] Interactive plots
-- [ ] First-launch setup screen
-- [ ] Phone UI (React Native)
-- [ ] Voice input (Stage 11)
+- [x] JSON API endpoints
+- [x] Integration tests + CI pipeline
+- [ ] Event title/type DB schema split
+- [ ] Architecture refactor — launcher-centric UI
+- [ ] Phone UI — React Native (Stage 10)
+- [ ] Voice & device control (Stage 11)
+- [ ] Docker — containerized deployment (Stage 12)
+- [ ] Home automation (Stage 13)
 
 ---
 
