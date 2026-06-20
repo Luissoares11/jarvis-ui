@@ -118,7 +118,7 @@ npx electron-builder
 - [x] Interactive plots
 - [x] JSON API endpoints
 - [x] Integration tests + CI pipeline
-- [ ] Event title/type DB schema split
+- [X] Event title/type DB schema split
 - [ ] Architecture refactor — launcher-centric UI
 - [ ] Phone UI — React Native (Stage 10)
 - [ ] Voice & device control (Stage 11)
