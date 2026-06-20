@@ -8,6 +8,9 @@ let mainWindow
 let miniWindow
 let tray
 let cardWindow
+let calendarWindow
+let tasksWindow
+let notesWindow
 
 
 function loadConfig() {
@@ -27,7 +30,6 @@ function saveConfig(config) {
   fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2))
 }
 
-// add these IPC handlers inside app.whenReady():
 ipcMain.handle('get-config', () => loadConfig())
 ipcMain.handle('save-config', (event, config) => {
   saveConfig(config)
@@ -144,6 +146,68 @@ app.whenReady().then(() => {
   registerHotkey(config.hotkey || 'CommandOrControl+Space')
 })
 
+function createFeatureWindow(hash, { width = 900, height = 700 } = {}) {
+  const win = new BrowserWindow({
+    width,
+    height,
+    frame: false,
+    transparent: false,
+    backgroundColor: '#030710',
+    show: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  })
+
+  if (app.isPackaged || process.env.NODE_ENV === 'production') {
+    win.loadFile(path.join(__dirname, 'dist/index.html'), { hash })
+  } else {
+    win.loadURL(`http://localhost:5173/#${hash}`)
+  }
+
+  win.on('close', (e) => {
+    e.preventDefault()
+    win.hide()
+  })
+
+  return win
+}
+
+function openFeatureWindow(name) {
+  switch (name) {
+    case 'dashboard':
+      mainWindow.show()
+      mainWindow.focus()
+      break
+
+    case 'calendar':
+      if (!calendarWindow) calendarWindow = createFeatureWindow('calendar')
+      calendarWindow.show()
+      calendarWindow.focus()
+      break
+
+    case 'tasks':
+      if (!tasksWindow) tasksWindow = createFeatureWindow('tasks')
+      tasksWindow.show()
+      tasksWindow.focus()
+      break
+
+    case 'notes':
+      if (!notesWindow) notesWindow = createFeatureWindow('notes')
+      notesWindow.show()
+      notesWindow.focus()
+      break
+
+    default:
+      console.log('Unknown feature window:', name)
+  }
+}
+
+ipcMain.on('open-feature', (event, name) => {
+  openFeatureWindow(name)
+})
+
 function registerHotkey(hotkey) {
   globalShortcut.unregisterAll()
   globalShortcut.register(hotkey, () => {
@@ -197,4 +261,22 @@ ipcMain.on('hide-card', () => {
 
 ipcMain.on('resize-card', (event, height) => {
   if (cardWindow) cardWindow.setSize(340, Math.min(height + 2, 600))
+})
+
+ipcMain.on('window-minimize', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (win) win.minimize()
+})
+
+ipcMain.on('window-maximize', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (win) {
+    if (win.isMaximized()) win.unmaximize()
+    else win.maximize()
+  }
+})
+
+ipcMain.on('window-close', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (win) win.hide()
 })

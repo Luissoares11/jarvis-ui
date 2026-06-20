@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { sendMessage } from '../api'
+import { sendMessage, getEvents } from '../api'
+import Titlebar from './Titlebar'
 import '../styles/calendar.css'
 
 const EVENT_TYPES = [
@@ -25,33 +26,18 @@ function Calendar() {
   const [loading, setLoading] = useState(false)
 
   const fetchEvents = async () => {
-    const res = await sendMessage('show all my events', 'panels')
-    parseEvents(res)
-  }
-
-  const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-
-  const parseEvents = (response) => {
-    if (!response || response.includes('No events')) {
-      setEvents([])
-      return
-    }
-
-    const lines = response.split('\n').filter(l => l.startsWith('  -'))
-
-    setEvents(lines.map((line, i) => {
-      const match = line.match(/(\d{2}) (\w+) (\d{4}) (\d{2}:\d{2}) — (.+)/)
-      if (!match) return null
-
+    const evts = await getEvents()
+    setEvents(evts.map(e => {
+      const dt = new Date(e.start_time)
       return {
-        id: i,
-        day: parseInt(match[1]),
-        month: MONTH_ABBR.indexOf(match[2]),
-        year: parseInt(match[3]),
-        time: match[4],
-        title: match[5].replace(/^[^\w]+/, '').trim(),
+        id: e.id,
+        day: dt.getDate(),
+        month: dt.getMonth(),
+        year: dt.getFullYear(),
+        time: dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+        title: e.title,
       }
-    }).filter(Boolean))
+    }))
   }
 
   const addEvent = async () => {
@@ -112,103 +98,106 @@ function Calendar() {
   const years = Array.from({ length: 10 }, (_, i) => today.getFullYear() - 2 + i)
 
   return (
-    <div className="page">
-      <div className="page-header">
-        <div className="page-title">Calendar</div>
-        <div className="page-subtitle">Your events</div>
-      </div>
-
-      <div className="cal-nav">
-        <select
-          className="cal-select"
-          value={currentDate.getMonth()}
-          onChange={e => setCurrentDate(new Date(currentDate.getFullYear(), parseInt(e.target.value), 1))}
-        >
-          {MONTHS.map((m, i) => (
-            <option key={i} value={i}>{m}</option>
-          ))}
-        </select>
-        <select
-          className="cal-select"
-          value={currentDate.getFullYear()}
-          onChange={e => setCurrentDate(new Date(parseInt(e.target.value), currentDate.getMonth(), 1))}
-        >
-          {years.map(y => (
-            <option key={y} value={y}>{y}</option>
-          ))}
-        </select>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div className="cal-grid">
-          {DAYS.map(d => (
-            <div key={d} className="cal-day-header">{d}</div>
-          ))}
-          {cells.map((day, i) => {
-            const dayEvents = day ? getEventsForDay(day) : []
-            return (
-              <div
-                key={i}
-                className={`cal-cell ${day ? 'active' : ''} ${isToday(day) ? 'today' : ''} ${selectedDay === day ? 'selected' : ''}`}
-                onClick={() => day && setSelectedDay(day === selectedDay ? null : day)}
-              >
-                {day && (
-                  <>
-                    <span className="cal-day-num">{day}</span>
-                    {dayEvents.length > 0 && <span className="cal-dot" />}
-                  </>
-                )}
-              </div>
-            )
-          })}
+    <div className="page-window">
+      <Titlebar />
+      <div className="page">
+        <div className="page-header">
+          <div className="page-title">Calendar</div>
+          <div className="page-subtitle">Your events</div>
         </div>
-      </div>
-      {selectedDay && (
-        <div className="cal-day-panel">
-          <div className="cal-day-panel-title">
-            {selectedDay} {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
-          </div>
 
-          <div className="event-input-grid">
-            <input
-              className="page-input"
-              placeholder="// event title..."
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-            />
-            <input
-              className="page-input"
-              placeholder="HH:MM"
-              value={time}
-              onChange={e => setTime(e.target.value)}
-            />
-            <select
-              className="page-input"
-              value={type}
-              onChange={e => setType(e.target.value)}
-            >
-              {EVENT_TYPES.map(t => (
-                <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
-              ))}
-            </select>
-            <button className="page-btn" onClick={addEvent}>Add ▶</button>
-          </div>
+        <div className="cal-nav">
+          <select
+            className="cal-select"
+            value={currentDate.getMonth()}
+            onChange={e => setCurrentDate(new Date(currentDate.getFullYear(), parseInt(e.target.value), 1))}
+          >
+            {MONTHS.map((m, i) => (
+              <option key={i} value={i}>{m}</option>
+            ))}
+          </select>
+          <select
+            className="cal-select"
+            value={currentDate.getFullYear()}
+            onChange={e => setCurrentDate(new Date(parseInt(e.target.value), currentDate.getMonth(), 1))}
+          >
+            {years.map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        </div>
 
-          {selectedDayEvents.length === 0 ? (
-            <div className="empty-state">No events on this day.</div>
-          ) : (
-            <div className="event-list">
-              {selectedDayEvents.map((event, i) => (
-                <div key={i} className="event-item">
-                  <div className="event-datetime">{event.time}</div>
-                  <div className="event-title">{event.title}</div>
-                  <div className="todo-delete" onClick={() => deleteEvent(event.title)}>✕</div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="cal-grid">
+            {DAYS.map(d => (
+              <div key={d} className="cal-day-header">{d}</div>
+            ))}
+            {cells.map((day, i) => {
+              const dayEvents = day ? getEventsForDay(day) : []
+              return (
+                <div
+                  key={i}
+                  className={`cal-cell ${day ? 'active' : ''} ${isToday(day) ? 'today' : ''} ${selectedDay === day ? 'selected' : ''}`}
+                  onClick={() => day && setSelectedDay(day === selectedDay ? null : day)}
+                >
+                  {day && (
+                    <>
+                      <span className="cal-day-num">{day}</span>
+                      {dayEvents.length > 0 && <span className="cal-dot" />}
+                    </>
+                  )}
                 </div>
-              ))}
-            </div>
-          )}
+              )
+            })}
+          </div>
         </div>
-      )}
+        {selectedDay && (
+          <div className="cal-day-panel">
+            <div className="cal-day-panel-title">
+              {selectedDay} {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
+            </div>
+
+            <div className="event-input-grid">
+              <input
+                className="page-input"
+                placeholder="// event title..."
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+              />
+              <input
+                className="page-input"
+                placeholder="HH:MM"
+                value={time}
+                onChange={e => setTime(e.target.value)}
+              />
+              <select
+                className="page-input"
+                value={type}
+                onChange={e => setType(e.target.value)}
+              >
+                {EVENT_TYPES.map(t => (
+                  <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                ))}
+              </select>
+              <button className="page-btn" onClick={addEvent}>Add ▶</button>
+            </div>
+
+            {selectedDayEvents.length === 0 ? (
+              <div className="empty-state">No events on this day.</div>
+            ) : (
+              <div className="event-list">
+                {selectedDayEvents.map((event) => (
+                  <div key={event.id} className="event-item">
+                    <div className="event-datetime">{event.time}</div>
+                    <div className="event-title">{event.title}</div>
+                    <div className="todo-delete" onClick={() => deleteEvent(event.title)}>✕</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

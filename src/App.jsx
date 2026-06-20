@@ -25,15 +25,20 @@ function App() {
   const isCard = window.location.hash === '#card'
   if (isCard) return <Card />
 
+  const isCalendar = window.location.hash === '#calendar'
+  if (isCalendar) return <Calendar standalone />
+
+  const isTasks = window.location.hash === '#tasks'
+  if (isTasks) return <Tasks standalone />
+
   const renderPage = () => {
     switch (activePage) {
-      case 'tasks':    return <Tasks />
-      case 'calendar': return <Calendar />     
       case 'memory':   return <Memory />
       case 'settings': return <Settings />
       default:         return <Chat messages={messages} setMessages={setMessages} />
     }
   }
+  
   const [toasts, setToasts] = useState([])
 
     const playNotificationSound = () => {

@@ -4,6 +4,12 @@ import '../styles/mini.css'
 
 const { ipcRenderer } = window.require('electron')
 
+function detectLauncherCommand(text) {
+  const t = text.trim().toLowerCase()
+  const match = t.match(/^open (dashboard|calendar|tasks|notes)$/)
+  return match ? match[1] : null
+}
+
 function formatTime(seconds) {
   const h = Math.floor(seconds / 3600)
   const m = Math.floor((seconds % 3600) / 60)
@@ -88,10 +94,22 @@ function Mini() {
   const sendMsg = async () => {
     const text = input.trim()
     if (!text || loading) return
-
+  
+    const feature = detectLauncherCommand(text)
+    if (feature) {
+      ipcRenderer.send('open-feature', feature)
+      setInput('')
+      setResponse(`Opening ${feature}...`)
+      setTimeout(() => {
+        setResponse('')
+        ipcRenderer.send('resize-mini', 60)
+      }, 800)
+      return
+    }
+  
     setLoading(true)
     setResponse('processing...')
-
+  
     try {
       const res = await sendMessage(text, 'mini')
 

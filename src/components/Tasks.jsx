@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { sendMessage } from '../api'
+import { sendMessage, getTasks, getReminders } from '../api'
+import Titlebar from './Titlebar'
 import '../styles/tasks.css'
 
 function Tasks() {
@@ -12,39 +13,18 @@ function Tasks() {
   const [loading, setLoading] = useState(false)
 
   const fetchAll = async () => {
-    const [todoRes, reminderRes] = await Promise.all([
-      sendMessage('show my tasks', 'panels'),
-      sendMessage('show reminders', 'panels'),
+    const [tasks, rems] = await Promise.all([
+      getTasks(),
+      getReminders(),
     ])
-    parseTodos(todoRes)
-    parseReminders(reminderRes)
-  }
-
-  const parseTodos = (response) => {
-    if (response.includes('empty') || response.includes('No tasks')) {
-      setTodos([])
-      return
-    }
-    const lines = response.split('\n').filter(l => l.match(/^\s+\d+\./))
-    setTodos(lines.map((line, i) => ({
-      id: i,
-      done: line.includes('✓'),
-      text: line.replace(/^\s+\d+\.\s[○✓]\s/, '').replace(/\s*\[.*?\]/, '').trim()
+    setTodos(tasks.map(t => ({ id: t.id, done: !!t.done, text: t.task })))
+    setReminders(rems.map(r => ({
+      id: r.id,
+      message: r.message,
+      time: new Date(r.remind_at).toLocaleString('en-GB', {
+        day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+      }),
     })))
-  }
-
-  const parseReminders = (response) => {
-    if (response.includes('No pending')) {
-      setReminders([])
-      return
-    }
-    const lines = response.split('\n').filter(l => l.startsWith('  -'))
-    setReminders(lines.map((line, i) => {
-      const match = line.match(/'(.+?)' at (.+)/)
-      return match
-        ? { id: i, message: match[1], time: match[2] }
-        : { id: i, message: line.trim(), time: '' }
-    }))
   }
 
   const addTodo = async () => {
@@ -83,7 +63,7 @@ function Tasks() {
   const deleteReminder = async (message) => {
     await sendMessage(`delete reminder ${message}`)
     await fetchAll()
-    }
+  }
 
   useEffect(() => { fetchAll() }, [])
 
@@ -108,8 +88,8 @@ function Tasks() {
         </div>
         <div className="todo-list">
           {todos.length === 0 && <div className="empty-state">No tasks, sir.</div>}
-          {todos.map((todo, i) => (
-            <div key={i} className={`todo-item ${todo.done ? 'done' : ''}`}>
+          {todos.map((todo) => (
+            <div key={todo.id} className={`todo-item ${todo.done ? 'done' : ''}`}>
               <div className="todo-status" onClick={() => !todo.done && completeTodo(todo.text)}>
                 {todo.done ? '✓' : '○'}
               </div>
@@ -147,8 +127,8 @@ function Tasks() {
         </div>
         <div className="reminder-list">
           {reminders.length === 0 && <div className="empty-state">No pending reminders, sir.</div>}
-          {reminders.map((r, i) => (
-            <div key={i} className="reminder-item">
+          {reminders.map((r) => (
+            <div key={r.id} className="reminder-item">
               <div className="reminder-icon">⏰</div>
               <div className="reminder-text">{r.message}</div>
               <div className="reminder-time">{r.time}</div>
