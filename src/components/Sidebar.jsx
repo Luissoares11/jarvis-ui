@@ -1,10 +1,15 @@
 import '../styles/sidebar.css'
 
+const { ipcRenderer } = window.require('electron')
+
 const navItems = [
-  { id: 'chat',     label: 'Chat',     count: null },
-  { id: 'tasks',    label: 'Tasks',    count: null },
-  { id: 'calendar', label: 'Calendar', count: null },
-  { id: 'memory',   label: 'Memory',   count: null },
+  { id: 'chat',   label: 'Chat',   count: null },
+  { id: 'memory', label: 'Memory', count: null },
+]
+
+const launchItems = [
+  { id: 'tasks',    label: 'Tasks' },
+  { id: 'calendar', label: 'Calendar' },
 ]
 
 const systemItems = [
@@ -32,6 +37,21 @@ function Sidebar({ activePage, setActivePage }) {
           </div>
         ))}
       </div>
+
+      <div className="sidebar-section">
+        <div className="sidebar-label">Open</div>
+        {launchItems.map(item => (
+          <div
+            key={item.id}
+            className="sidebar-item"
+            onClick={() => ipcRenderer.send('open-feature', item.id)}
+          >
+            <div className="si-dot" />
+            <span className="si-label">{item.label}</span>
+          </div>
+        ))}
+      </div>
+
       <div className="sidebar-section">
         <div className="sidebar-label">System</div>
         {systemItems.map(item => (

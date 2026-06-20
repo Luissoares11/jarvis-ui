@@ -1,9 +1,11 @@
 import '../styles/titlebar.css'
 
+const { ipcRenderer } = window.require('electron')
+
 function Titlebar() {
-  const handleMinimize = () => window.electronAPI?.minimize()
-  const handleMaximize = () => window.electronAPI?.maximize()
-  const handleClose = () => window.electronAPI?.close()
+  const handleMinimize = () => ipcRenderer.send('window-minimize')
+  const handleMaximize = () => ipcRenderer.send('window-maximize')
+  const handleClose = () => ipcRenderer.send('window-close')
 
   return (
     <div className="titlebar">
