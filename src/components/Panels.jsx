@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { sendMessage } from '../api'
+import { sendMessage, getTasks, getReminders, getEvents } from '../api'
 import TimerDisplay from './TimerDisplay'
 import '../styles/panels.css'
 
@@ -34,38 +34,6 @@ function parseWeather(response) {
   ]
 }
 
-function parseTodos(response) {
-  const lines = response.split('\n').filter(l => l.match(/^\s+\d+\./))
-  if (!lines.length) return [{ label: 'No tasks', value: '' }]
-  return lines.slice(0, 4).map(line => {
-    const done   = line.includes('✓')
-    const text   = line.replace(/^\s+\d+\.\s[○✓]\s/, '').trim()
-    return { label: text, value: done ? '✓' : '○' }
-  })
-}
-
-function parseReminders(response) {
-  const lines = response.split('\n').filter(l => l.startsWith('  -'))
-  if (!lines.length) return [{ label: 'No reminders', value: '' }]
-  return lines.slice(0, 3).map(line => {
-    const match = line.match(/'(.+?)' at (.+)/)
-    return match
-      ? { label: match[1], value: match[2] }
-      : { label: line.trim(), value: '' }
-  })
-}
-
-function parseEvents(response) {
-  const lines = response.split('\n').filter(l => l.startsWith('  -'))
-  if (!lines.length) return [{ label: 'No events', value: '' }]
-  return lines.slice(0, 3).map(line => {
-    const match = line.match(/(\d{2} \w+ \d{2}:\d{2}) — (.+)/)
-    return match
-      ? { label: match[2].replace(/^[^\w]+/, '').trim(), value: match[1] }
-      : { label: line.trim(), value: '' }
-  })
-}
-
 function Panels() {
   const [weather,   setWeather]   = useState([{ label: 'Loading...', value: '' }])
   const [todos,     setTodos]     = useState([{ label: 'Loading...', value: '' }])
@@ -74,35 +42,58 @@ function Panels() {
 
   const refresh = async () => {
     try {
-      const [w, t, r, e] = await Promise.all([
+      const [w, tasks, rems, evts] = await Promise.all([
         sendMessage('weather in Castelo de Paiva', 'panels'),
-        sendMessage('show my tasks', 'panels'),
-        sendMessage('show reminders', 'panels'),
-        sendMessage('show my events', 'panels'),
+        getTasks(),
+        getReminders(),
+        getEvents(),
       ])
+
       setWeather(parseWeather(w))
-      setTodos(parseTodos(t))
-      setReminders(parseReminders(r))
-      setEvents(parseEvents(e))
+
+      setTodos(
+        tasks.length === 0
+          ? [{ label: 'No tasks', value: '' }]
+          : tasks.slice(0, 4).map(t => ({ label: t.task, value: t.done ? '✓' : '○' }))
+      )
+
+      setReminders(
+        rems.length === 0
+          ? [{ label: 'No reminders', value: '' }]
+          : rems.slice(0, 3).map(r => ({
+              label: r.message,
+              value: new Date(r.remind_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+            }))
+      )
+
+      setEvents(
+        evts.length === 0
+          ? [{ label: 'No events', value: '' }]
+          : evts.slice(0, 3).map(e => ({
+              label: e.title.replace(/^[^\w]+/, '').trim(),
+              value: new Date(e.start_time).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }),
+            }))
+      )
+
     } catch (err) {
-    console.error('Panel refresh error:', err)
-    setWeather([{ label: 'Error', value: err.message }])
+      console.error('Panel refresh error:', err)
+      setWeather([{ label: 'Error', value: err.message }])
     }
   }
 
   useEffect(() => {
     refresh()
-    const interval = setInterval(refresh, 60000)// refresh every 1 minute
+    const interval = setInterval(refresh, 60000)
     return () => clearInterval(interval)
   }, [])
 
   return (
     <div className="panel-area">
       <div className="panel-refresh" onClick={refresh}>↻ refresh</div>
-      <PanelCard title="Weather" items={weather} />
-      <PanelCard title="Tasks"   items={todos} />
+      <PanelCard title="Weather"   items={weather} />
+      <PanelCard title="Tasks"     items={todos} />
       <PanelCard title="Reminders" items={reminders} />
-      <PanelCard title="Events"  items={events} />
+      <PanelCard title="Events"    items={events} />
       <TimerDisplay />
     </div>
   )

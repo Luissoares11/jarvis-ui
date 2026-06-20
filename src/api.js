@@ -46,3 +46,45 @@ export async function getTimers() {
     return []
   }
 }
+
+export async function getTasks() {
+  try {
+    const config = await getConfig()
+    if (!config.apiUrl || !config.token) return []
+    const res = await axios.get(`${config.apiUrl}/tasks`, {
+      headers: { Authorization: `Bearer ${config.token}` }
+    })
+    return res.data.tasks
+  } catch (err) {
+    console.log('TASKS ERROR:', err.message)
+    return []
+  }
+}
+
+export async function getReminders() {
+  try {
+    const config = await getConfig()
+    if (!config.apiUrl || !config.token) return []
+    const res = await axios.get(`${config.apiUrl}/reminders`, {
+      headers: { Authorization: `Bearer ${config.token}` }
+    })
+    return res.data.reminders
+  } catch (err) {
+    console.log('REMINDERS ERROR:', err.message)
+    return []
+  }
+}
+
+export async function getEvents() {
+  try {
+    const config = await getConfig()
+    if (!config.apiUrl || !config.token) return []
+    const res = await axios.get(`${config.apiUrl}/events`, {
+      headers: { Authorization: `Bearer ${config.token}` }
+    })
+    return res.data.events
+  } catch (err) {
+    console.log('EVENTS ERROR:', err.message)
+    return []
+  }
+}
