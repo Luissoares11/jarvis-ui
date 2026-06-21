@@ -238,3 +238,34 @@ select.page-input option {
   opacity: 0.6;
   margin-right: 8px;
 }
+
+.board-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.board-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #071828;
+  border: 1px solid #0d2a40;
+  border-radius: 4px;
+  border-left: 2px solid #378ADD;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.board-item:hover {
+  border-color: #378ADD;
+  background: #0a2236;
+}
+
+.board-title {
+  font-size: 13px;
+  color: #70b8f0;
+  letter-spacing: 0.5px;
+}

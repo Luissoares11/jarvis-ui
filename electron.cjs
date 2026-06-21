@@ -56,10 +56,12 @@ function createMainWindow() {
     mainWindow.loadURL('http://localhost:5173')
   }
 
+  /*
     mainWindow.webContents.once('did-finish-load', () => {
     mainWindow.webContents.openDevTools({ mode: 'detach' })
   })
-  
+  */
+   
   mainWindow.on('close', (e) => {
     e.preventDefault()
     mainWindow.hide()
