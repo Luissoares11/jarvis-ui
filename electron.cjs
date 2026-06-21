@@ -11,7 +11,7 @@ let cardWindow
 let calendarWindow
 let tasksWindow
 let notesWindow
-
+let boardWindows = {}
 
 function loadConfig() {
   try {
@@ -55,6 +55,10 @@ function createMainWindow() {
   } else {
     mainWindow.loadURL('http://localhost:5173')
   }
+
+    mainWindow.webContents.once('did-finish-load', () => {
+    mainWindow.webContents.openDevTools({ mode: 'detach' })
+  })
   
   mainWindow.on('close', (e) => {
     e.preventDefault()
@@ -208,6 +212,43 @@ ipcMain.on('open-feature', (event, name) => {
   openFeatureWindow(name)
 })
 
+function openBoardWindow(boardId, boardTitle) {
+  if (boardWindows[boardId]) {
+    boardWindows[boardId].show()
+    boardWindows[boardId].focus()
+    return
+  }
+
+  const hash = `board?id=${encodeURIComponent(boardId)}&title=${encodeURIComponent(boardTitle)}`
+
+  const win = new BrowserWindow({
+    width: 900,
+    height: 700,
+    frame: false,
+    transparent: false,
+    backgroundColor: '#030710',
+    show: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  })
+
+  if (app.isPackaged || process.env.NODE_ENV === 'production') {
+    win.loadFile(path.join(__dirname, 'dist/index.html'), { hash })
+  } else {
+    win.loadURL(`http://localhost:5173/#${hash}`)
+  }
+
+  win.once('ready-to-show', () => win.show())
+
+  win.on('closed', () => {
+    delete boardWindows[boardId]
+  })
+
+  boardWindows[boardId] = win
+}
+
 function registerHotkey(hotkey) {
   globalShortcut.unregisterAll()
   globalShortcut.register(hotkey, () => {
@@ -279,4 +320,8 @@ ipcMain.on('window-maximize', (event) => {
 ipcMain.on('window-close', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   if (win) win.hide()
+})
+
+ipcMain.on('open-board', (event, { id, title }) => {
+  openBoardWindow(id, title)
 })

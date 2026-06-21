@@ -213,3 +213,28 @@ select.page-input option {
   background: #071828;
   color: #378ADD;
 }
+
+.board-close-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  -webkit-app-region: drag;
+}
+.board-close-btn {
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.board-close-btn:hover {
+  opacity: 1;
+}
+
+.page-input-time {
+  flex: 0 0 110px;
+}
+.todo-time {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  margin-right: 8px;
+}

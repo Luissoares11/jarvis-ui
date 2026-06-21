@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { sendMessage, getTasks, getReminders, getEvents } from '../api'
+import { sendMessage, getEvents } from '../api'
 import TimerDisplay from './TimerDisplay'
 import '../styles/panels.css'
 
@@ -40,7 +40,7 @@ function Panels() {
   const [reminders, setReminders] = useState([{ label: 'Loading...', value: '' }])
   const [events,    setEvents]    = useState([{ label: 'Loading...', value: '' }])
 
-  const refresh = async () => {
+  /*const refresh = async () => {
     try {
       const [w, tasks, rems, evts] = await Promise.all([
         sendMessage('weather in Castelo de Paiva', 'panels'),
@@ -97,6 +97,7 @@ function Panels() {
       <TimerDisplay />
     </div>
   )
+  */
 }
 
 export default Panels

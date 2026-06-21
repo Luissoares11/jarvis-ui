@@ -11,6 +11,7 @@ import Calendar from './components/Calendar'
 import Memory from './components/Memory'
 import Settings from './components/Settings'
 import Card from './components/Card'
+import BoardPage from './components/BoardPage'
 import './styles/app.css'
 
 function App() {
@@ -30,6 +31,14 @@ function App() {
 
   const isTasks = window.location.hash === '#tasks'
   if (isTasks) return <Tasks standalone />
+
+  const isBoard = window.location.hash.startsWith('#board')
+  if (isBoard) {
+    const params = new URLSearchParams(window.location.hash.split('?')[1] || '')
+    const boardId = params.get('id')
+    const boardTitle = params.get('title')
+    return <BoardPage boardId={boardId} boardTitle={boardTitle} />
+}
 
   const renderPage = () => {
     switch (activePage) {

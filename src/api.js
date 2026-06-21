@@ -47,31 +47,102 @@ export async function getTimers() {
   }
 }
 
-export async function getTasks() {
+export async function getBoards() {
   try {
     const config = await getConfig()
     if (!config.apiUrl || !config.token) return []
-    const res = await axios.get(`${config.apiUrl}/tasks`, {
+    const res = await axios.get(`${config.apiUrl}/boards`, {
       headers: { Authorization: `Bearer ${config.token}` }
     })
-    return res.data.tasks
+    return res.data.boards
   } catch (err) {
-    console.log('TASKS ERROR:', err.message)
+    console.log('BOARDS ERROR:', err.message)
     return []
   }
 }
 
-export async function getReminders() {
+export async function createBoard(title) {
+  try {
+    const config = await getConfig()
+    const res = await axios.post(
+      `${config.apiUrl}/boards`,
+      { title },
+      { headers: { Authorization: `Bearer ${config.token}` } }
+    )
+    return res.data
+  } catch (err) {
+    console.log('CREATE BOARD ERROR:', err.message)
+    return null
+  }
+}
+
+export async function deleteBoard(boardId) {
+  try {
+    const config = await getConfig()
+    await axios.delete(`${config.apiUrl}/boards/${boardId}`, {
+      headers: { Authorization: `Bearer ${config.token}` }
+    })
+    return true
+  } catch (err) {
+    console.log('DELETE BOARD ERROR:', err.message)
+    return false
+  }
+}
+
+export async function getBoardTasks(boardId) {
   try {
     const config = await getConfig()
     if (!config.apiUrl || !config.token) return []
-    const res = await axios.get(`${config.apiUrl}/reminders`, {
+    const res = await axios.get(`${config.apiUrl}/boards/${boardId}/tasks`, {
       headers: { Authorization: `Bearer ${config.token}` }
     })
-    return res.data.reminders
+    return res.data.tasks
   } catch (err) {
-    console.log('REMINDERS ERROR:', err.message)
+    console.log('BOARD TASKS ERROR:', err.message)
     return []
+  }
+}
+
+export async function createTask(boardId, task, dueTime = null) {
+  try {
+    const config = await getConfig()
+    const res = await axios.post(
+      `${config.apiUrl}/tasks`,
+      { board_id: boardId, task, due_time: dueTime },
+      { headers: { Authorization: `Bearer ${config.token}` } }
+    )
+    return res.data
+  } catch (err) {
+    console.log('CREATE TASK ERROR:', err.message)
+    return null
+  }
+}
+
+export async function setTaskDone(taskId, done) {
+  try {
+    const config = await getConfig()
+    await axios.patch(
+      `${config.apiUrl}/tasks/${taskId}`,
+      null,
+      { params: { done }, headers: { Authorization: `Bearer ${config.token}` } }
+    )
+    return true
+  } catch (err) {
+    console.log('SET TASK DONE ERROR:', err.message)
+    return false
+  }
+}
+
+export async function deleteTask(taskId) {
+  try {
+    const config = await getConfig()
+    await axios.delete(`${config.apiUrl}/tasks/${taskId}`, {
+      headers: { Authorization: `Bearer ${config.token}` }
+    })
+    return true
+  } catch (err) {
+    console.log('DELETE TASK ERROR:', err.message)
+    return false
   }
 }
 
