@@ -46,22 +46,58 @@ A cinematic, Iron Man-inspired desktop app that connects to the [Jarvis API](htt
 ```
 jarvis-ui/
 ├── src/
-│   ├── components/
-│   │   ├── Titlebar.jsx     # custom frameless titlebar
-│   │   ├── Sidebar.jsx      # navigation
-│   │   ├── Chat.jsx         # main chat interface
-│   │   ├── Panels.jsx       # live data panels
-│   │   ├── Tasks.jsx        # tasks + reminders page
-│   │   ├── Calendar.jsx     # events page
-│   │   ├── Memory.jsx       # memory browser
-│   │   ├── Settings.jsx     # config page
-│   │   └── Mini.jsx         # mini overlay mode
-│   ├── styles/              # per-component CSS
-│   ├── api.js               # Jarvis API calls
-│   └── config.js            # dynamic config via Electron IPC
-├── electron.cjs             # Electron main process
-├── .env                     # local config (not committed)
-└── package.json
+│   ├── assets/
+│   ├── shared/
+│   │   ├── components/
+│   │   │   ├── TimerDisplay.jsx
+│   │   │   └── Titlebar.jsx
+│   │   ├── styles/
+│   │   │   ├── app.css
+│   │   │   └── titlebar.css
+│   │   └── utils/
+│   │       ├── api.js
+│   │       ├── config.js
+│   │       └── launcher.js
+│   │
+│   ├── windows/
+│   │   ├── calendar/
+│   │   │   ├── Calendar.jsx
+│   │   │   └── calendar.css
+│   │   │
+│   │   ├── card/
+│   │   │   ├── Card.jsx
+│   │   │   └── card.css
+│   │   │
+│   │   ├── chat/
+│   │   │   ├── Chat.jsx
+│   │   │   └── chat.css
+│   │   │
+│   │   ├── dashboard/
+│   │   │   ├── Dashboard.jsx
+│   │   │   └── dashboard.css
+│   │   │
+│   │   ├── memory/
+│   │   │   ├── Memory.jsx
+│   │   │   └── memory.css
+│   │   │
+│   │   ├── mini/
+│   │   │   ├── Mini.jsx
+│   │   │   └── mini.css
+│   │   │
+│   │   ├── settings/
+│   │   │   ├── Settings.jsx
+│   │   │   └── settings.css
+│   │   │
+│   │   └── tasks/
+│   │       ├── Tasks.jsx
+│   │       └── tasks.css
+│   │
+│   ├── App.jsx
+│   └── main.jsx
+│
+├── electron.cjs
+├── .env
+├── package.json
 ```
 
 ---
