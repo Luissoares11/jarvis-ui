@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import '../styles/card.css'
+import './card.css'
 
 const { ipcRenderer } = window.require('electron')
 

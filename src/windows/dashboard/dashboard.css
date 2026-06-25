@@ -1,0 +1,330 @@
+.dash {
+  width: 100vw;
+  height: 100vh;
+  background: #050a0f;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Clock ───────────────────────────────────────────────── */
+
+.clock-zone {
+  padding: 18px 28px 16px;
+  border-bottom: 1px solid #0a1e30;
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.clock-h {
+  font-size: 58px;
+  letter-spacing: -2px;
+  color: #378ADD;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.clock-colon {
+  font-size: 58px;
+  color: #1e4d6b;
+  margin: 0 3px;
+  line-height: 1;
+}
+
+.clock-secs {
+  font-size: 22px;
+  color: #1e4d6b;
+  margin-left: 4px;
+  align-self: flex-end;
+  padding-bottom: 7px;
+}
+
+.clock-date {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #1e4d6b;
+  text-transform: uppercase;
+  margin-left: auto;
+  align-self: center;
+}
+
+/* ── Settings button in titlebar ─────────────────────────── */
+
+.settings-btn {
+  background: none;
+  border: none;
+  color: #1e4d6b;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+  transition: color 0.15s;
+  line-height: 1;
+}
+
+.settings-btn:hover {
+  color: #378ADD;
+}
+
+/* ── Widgets grid ────────────────────────────────────────── */
+
+.widgets {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px;
+  background: #0a1e30;
+  overflow: hidden;
+}
+
+.widget {
+  background: #050a0f;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+}
+
+.widget-label {
+  font-size: 8px;
+  letter-spacing: 3px;
+  color: #1e4d6b;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.widget-label-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #378ADD;
+}
+
+.empty-state {
+  font-size: 11px;
+  color: #1e4d6b;
+  letter-spacing: 0.5px;
+  padding: 8px 0;
+}
+
+/* ── Events ──────────────────────────────────────────────── */
+
+.event-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #071828;
+}
+
+.event-row:last-of-type {
+  border-bottom: none;
+}
+
+.event-time {
+  font-size: 10px;
+  color: #1e4d6b;
+  min-width: 38px;
+  flex-shrink: 0;
+}
+
+.event-title {
+  font-size: 11px;
+  color: #70b8f0;
+  letter-spacing: 0.5px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-badge {
+  font-size: 8px;
+  letter-spacing: 1px;
+  padding: 2px 5px;
+  border: 1px solid #0d2a40;
+  color: #1e4d6b;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Tasks ───────────────────────────────────────────────── */
+
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 0;
+  border-bottom: 1px solid #071828;
+}
+
+.task-row:last-of-type {
+  border-bottom: none;
+}
+
+.task-dot {
+  width: 5px;
+  height: 5px;
+  border: 1px solid #378ADD;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.task-dot.done {
+  background: #1d9e75;
+  border-color: #1d9e75;
+}
+
+.task-text {
+  font-size: 11px;
+  color: #70b8f0;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-text.done {
+  color: #1e4d6b;
+  text-decoration: line-through;
+}
+
+/* ── Weather ─────────────────────────────────────────────── */
+
+.weather-hero {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 4px 0 10px;
+}
+
+.weather-temp {
+  font-size: 34px;
+  color: #378ADD;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.weather-cond-main {
+  font-size: 11px;
+  color: #70b8f0;
+  letter-spacing: 0.5px;
+}
+
+.weather-cond-loc {
+  font-size: 9px;
+  color: #1e4d6b;
+  letter-spacing: 1px;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+.weather-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #071828;
+}
+
+.weather-row:last-of-type {
+  border-bottom: none;
+}
+
+.wk {
+  font-size: 9px;
+  color: #1e4d6b;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.wv {
+  font-size: 9px;
+  color: #70b8f0;
+  letter-spacing: 1px;
+}
+
+/* ── Open buttons ────────────────────────────────────────── */
+
+.open-btn {
+  margin-top: auto;
+  padding-top: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: #378ADD;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.open-btn:hover {
+  opacity: 1;
+}
+
+/* ── Status bar ──────────────────────────────────────────── */
+
+.statusbar {
+  height: 28px;
+  background: #030710;
+  border-top: 1px solid #0a1e30;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sdot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.sdot.on  { background: #1d9e75; }
+.sdot.off { background: #ff4444; }
+
+.sval {
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #1e4d6b;
+}
+
+.sval.on  { color: #1d9e75; }
+.sval.off { color: #ff4444; }
+
+.sval-accent {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #378ADD;
+  margin-left: 4px;
+}
+
+.status-divider {
+  width: 1px;
+  height: 12px;
+  background: #0d2a40;
+}
+
+.status-right {
+  margin-left: auto;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #1e4d6b;
+  text-transform: uppercase;
+}

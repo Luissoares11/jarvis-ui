@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-import { sendMessage as sendToJarvis, pingApi } from '../api'
-import { getConfig } from '../config'
-import '../styles/chat.css'
+import { sendMessage as sendToJarvis, pingApi } from '../../shared/utils/api'
+import { getConfig } from '../../shared/utils/config'
+import './chat.css'
 
 function Chat({ messages, setMessages }) {
   const [input, setInput] = useState('')

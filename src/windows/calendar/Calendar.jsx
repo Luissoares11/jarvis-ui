@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { sendMessage, getEvents } from '../api'
-import Titlebar from './Titlebar'
-import '../styles/calendar.css'
+import { sendMessage, getEvents } from '../../shared/utils/api'
+import Titlebar from '../../shared/components/Titlebar'
+import './calendar.css'
 
 const EVENT_TYPES = [
   'exam', 'test', 'appointment', 'anniversary',

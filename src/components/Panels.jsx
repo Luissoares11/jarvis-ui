@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { sendMessage, getEvents } from '../api'
+import { sendMessage, getEvents } from '../shared/utils/api'
 import TimerDisplay from './TimerDisplay'
 import '../styles/panels.css'
 

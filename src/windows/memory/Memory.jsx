@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { sendMessage } from '../api'
-import '../styles/memory.css'
+import { sendMessage } from '../../shared/utils/api'
+import './memory.css'
 
 function Memory() {
   const [facts, setFacts] = useState([])

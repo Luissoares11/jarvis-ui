@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { sendMessage, getTimers } from '../api'
-import '../styles/mini.css'
+import { sendMessage, getTimers } from '../../shared/utils/api'
+import './mini.css'
 
 const { ipcRenderer } = window.require('electron')
 
@@ -115,7 +115,7 @@ function Mini() {
 
       if (res.startsWith('PLOT:')) {
         const filename = res.replace('PLOT:', '')
-        const { getConfig } = await import('../config')
+        const { getConfig } = await import('../../shared/utils/config')
         const config = await getConfig()
         window.open(`${config.apiUrl}/plots/${filename}`, '_blank')
         setResponse('Graph opened.')

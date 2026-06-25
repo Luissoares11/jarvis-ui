@@ -2,16 +2,9 @@ const { app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain } = require('ele
 const path = require('path')
 const fs = require('fs')
 
-const CONFIG_PATH = path.join(app.getPath('userData'), 'jarvis-config.json')
+// ─── Config ──────────────────────────────────────────────────────────────────
 
-let mainWindow
-let miniWindow
-let tray
-let cardWindow
-let calendarWindow
-let tasksWindow
-let notesWindow
-let boardWindows = {}
+const CONFIG_PATH = path.join(app.getPath('userData'), 'jarvis-config.json')
 
 function loadConfig() {
   try {
@@ -37,6 +30,55 @@ ipcMain.handle('save-config', (event, config) => {
   return true
 })
 
+// ─── Window Registry ──────────────────────────────────────────────────────────
+// To add a new feature window, add one entry here. Nothing else needs to change.
+
+const WINDOW_CONFIG = {
+  calendar:  { hash: 'calendar', width: 900, height: 700 },
+  tasks:     { hash: 'tasks',    width: 900, height: 700 },
+  settings:     { hash: 'settings', width: 900, height: 700 },
+  notes:     { hash: 'notes',    width: 900, height: 700 },
+  // dashboard is handled by showing mainWindow — no entry needed
+}
+
+// Holds all lazily-created feature + board windows
+const featureWindows = {}
+
+// ─── Window Factories ─────────────────────────────────────────────────────────
+
+function loadHash(win, hash) {
+  if (app.isPackaged || process.env.NODE_ENV === 'production') {
+    win.loadFile(path.join(__dirname, 'dist/index.html'), { hash })
+  } else {
+    win.loadURL(`http://localhost:5173/#${hash}`)
+  }
+}
+
+function createStandardWindow(hash, { width = 900, height = 700 } = {}) {
+  const win = new BrowserWindow({
+    width,
+    height,
+    frame: false,
+    transparent: false,
+    backgroundColor: '#030710',
+    show: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  })
+
+  loadHash(win, hash)
+
+  // Hide instead of close so the window is reusable
+  win.on('close', (e) => {
+    e.preventDefault()
+    win.hide()
+  })
+
+  return win
+}
+
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1400,
@@ -48,20 +90,14 @@ function createMainWindow() {
       contextIsolation: false,
     },
   })
-  
+
   if (app.isPackaged || process.env.NODE_ENV === 'production') {
     mainWindow.loadFile(path.join(__dirname, 'dist/index.html'))
-    mainWindow.once('ready-to-show', () => mainWindow.show()) 
+    mainWindow.once('ready-to-show', () => mainWindow.show())
   } else {
     mainWindow.loadURL('http://localhost:5173')
   }
 
-  /*
-    mainWindow.webContents.once('did-finish-load', () => {
-    mainWindow.webContents.openDevTools({ mode: 'detach' })
-  })
-  */
-   
   mainWindow.on('close', (e) => {
     e.preventDefault()
     mainWindow.hide()
@@ -84,38 +120,11 @@ function createMiniWindow() {
     },
   })
 
-  if (app.isPackaged || process.env.NODE_ENV === 'production') {
-  miniWindow.loadFile(path.join(__dirname, 'dist/index.html'), { hash: 'mini' })
-} else {
-  miniWindow.loadURL('http://localhost:5173/#mini')
-}
-
+  loadHash(miniWindow, 'mini')
   miniWindow.hide()
 
   miniWindow.on('blur', () => {
     miniWindow.hide()
-  })
-}
-
-function createTray() {
-  const iconPath = app.isPackaged
-    ? path.join(process.resourcesPath, 'tray-icon.png')
-    : path.join(__dirname, 'src/assets/tray-icon.png')
-
-  tray = new Tray(iconPath)
-
-  const menu = Menu.buildFromTemplate([
-    { label: 'Open Jarvis', click: () => { mainWindow.show(); mainWindow.focus() } },
-    { type: 'separator' },
-    { label: 'Quit', click: () => { app.exit() } },
-  ])
-
-  tray.setToolTip('Jarvis')
-  tray.setContextMenu(menu)
-
-  tray.on('click', () => {
-    mainWindow.show()
-    mainWindow.focus()
   })
 }
 
@@ -135,121 +144,75 @@ function createCardWindow() {
     },
   })
 
-  if (app.isPackaged || process.env.NODE_ENV === 'production') {
-  cardWindow.loadFile(path.join(__dirname, 'dist/index.html'), { hash: 'card' })
-} else {
-  cardWindow.loadURL('http://localhost:5173/#card')
-}
+  loadHash(cardWindow, 'card')
 }
 
-app.whenReady().then(() => {
-  createMainWindow()
-  createMiniWindow()
-  createTray()
-  createCardWindow()
+function createTray() {
+  const iconPath = app.isPackaged
+    ? path.join(process.resourcesPath, 'tray-icon.png')
+    : path.join(__dirname, 'src/assets/tray-icon.png')
 
-  const config = loadConfig()
-  registerHotkey(config.hotkey || 'CommandOrControl+Space')
-})
+  tray = new Tray(iconPath)
 
-function createFeatureWindow(hash, { width = 900, height = 700 } = {}) {
-  const win = new BrowserWindow({
-    width,
-    height,
-    frame: false,
-    transparent: false,
-    backgroundColor: '#030710',
-    show: false,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-    },
-  })
+  const menu = Menu.buildFromTemplate([
+    { label: 'Open Jarvis', click: () => { mainWindow.show(); mainWindow.focus() } },
+    { type: 'separator' },
+    { label: 'Quit', click: () => app.exit() },
+  ])
 
-  if (app.isPackaged || process.env.NODE_ENV === 'production') {
-    win.loadFile(path.join(__dirname, 'dist/index.html'), { hash })
-  } else {
-    win.loadURL(`http://localhost:5173/#${hash}`)
-  }
-
-  win.on('close', (e) => {
-    e.preventDefault()
-    win.hide()
-  })
-
-  return win
+  tray.setToolTip('Jarvis')
+  tray.setContextMenu(menu)
+  tray.on('click', () => { mainWindow.show(); mainWindow.focus() })
 }
+
+// ─── Feature Window Routing ───────────────────────────────────────────────────
 
 function openFeatureWindow(name) {
-  switch (name) {
-    case 'dashboard':
-      mainWindow.show()
-      mainWindow.focus()
-      break
-
-    case 'calendar':
-      if (!calendarWindow) calendarWindow = createFeatureWindow('calendar')
-      calendarWindow.show()
-      calendarWindow.focus()
-      break
-
-    case 'tasks':
-      if (!tasksWindow) tasksWindow = createFeatureWindow('tasks')
-      tasksWindow.show()
-      tasksWindow.focus()
-      break
-
-    case 'notes':
-      if (!notesWindow) notesWindow = createFeatureWindow('notes')
-      notesWindow.show()
-      notesWindow.focus()
-      break
-
-    default:
-      console.log('Unknown feature window:', name)
+  if (name === 'dashboard') {
+    mainWindow.show()
+    mainWindow.focus()
+    return
   }
+
+  const config = WINDOW_CONFIG[name]
+  if (!config) {
+    console.warn('[Jarvis] Unknown feature window:', name)
+    return
+  }
+
+  if (!featureWindows[name]) {
+    featureWindows[name] = createStandardWindow(config.hash, config)
+  }
+
+  featureWindows[name].show()
+  featureWindows[name].focus()
 }
 
-ipcMain.on('open-feature', (event, name) => {
-  openFeatureWindow(name)
-})
-
 function openBoardWindow(boardId, boardTitle) {
-  if (boardWindows[boardId]) {
-    boardWindows[boardId].show()
-    boardWindows[boardId].focus()
+  const key = `board:${boardId}`
+
+  if (featureWindows[key]) {
+    featureWindows[key].show()
+    featureWindows[key].focus()
     return
   }
 
   const hash = `board?id=${encodeURIComponent(boardId)}&title=${encodeURIComponent(boardTitle)}`
-
-  const win = new BrowserWindow({
-    width: 900,
-    height: 700,
-    frame: false,
-    transparent: false,
-    backgroundColor: '#030710',
-    show: false,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-    },
-  })
-
-  if (app.isPackaged || process.env.NODE_ENV === 'production') {
-    win.loadFile(path.join(__dirname, 'dist/index.html'), { hash })
-  } else {
-    win.loadURL(`http://localhost:5173/#${hash}`)
-  }
+  const win = createStandardWindow(hash, { width: 900, height: 700 })
 
   win.once('ready-to-show', () => win.show())
 
+  // Board windows are fully destroyed on close (not hidden) — each board
+  // is a fresh session, so we don't need to keep them alive in the background.
+  win.removeAllListeners('close')
   win.on('closed', () => {
-    delete boardWindows[boardId]
+    delete featureWindows[key]
   })
 
-  boardWindows[boardId] = win
+  featureWindows[key] = win
 }
+
+// ─── Hotkey ───────────────────────────────────────────────────────────────────
 
 function registerHotkey(hotkey) {
   globalShortcut.unregisterAll()
@@ -272,58 +235,56 @@ function registerHotkey(hotkey) {
   })
 }
 
-app.on('window-all-closed', () => {})
+// ─── App Lifecycle ────────────────────────────────────────────────────────────
 
-app.on('will-quit', () => {
-  globalShortcut.unregisterAll()
+let mainWindow, miniWindow, tray, cardWindow
+
+app.whenReady().then(() => {
+  createMainWindow()
+  createMiniWindow()
+  createTray()
+  createCardWindow()
+
+  const config = loadConfig()
+  registerHotkey(config.hotkey || 'CommandOrControl+Space')
 })
 
+app.on('window-all-closed', () => {})
+app.on('will-quit', () => globalShortcut.unregisterAll())
+
+// ─── IPC ──────────────────────────────────────────────────────────────────────
+
+ipcMain.on('open-feature', (event, name) => openFeatureWindow(name))
+ipcMain.on('open-board',   (event, { id, title }) => openBoardWindow(id, title))
+
 ipcMain.on('resize-mini', (event, height) => {
-  if (miniWindow) {
-    miniWindow.setSize(500, Math.min(height, 400))
-  }
+  if (miniWindow) miniWindow.setSize(500, Math.min(height, 400))
 })
 
 ipcMain.on('show-card', (event, { data, type }) => {
   if (!cardWindow) return
-
-  const miniPos = miniWindow.getPosition()
-  cardWindow.setPosition(miniPos[0], miniPos[1] - 420)
+  const [mx, my] = miniWindow.getPosition()
+  cardWindow.setPosition(mx, my - 420)
   cardWindow.show()
   cardWindow.focus()
-  
-  // send data after window is shown
-  setTimeout(() => {
-    cardWindow.webContents.send('card-data', { data, type })
-  }, 50)
+  setTimeout(() => cardWindow.webContents.send('card-data', { data, type }), 50)
 })
 
-ipcMain.on('hide-card', () => {
-  if (cardWindow) cardWindow.hide()
-})
-
-ipcMain.on('resize-card', (event, height) => {
+ipcMain.on('hide-card',    () => { if (cardWindow) cardWindow.hide() })
+ipcMain.on('resize-card',  (event, height) => {
   if (cardWindow) cardWindow.setSize(340, Math.min(height + 2, 600))
 })
 
 ipcMain.on('window-minimize', (event) => {
-  const win = BrowserWindow.fromWebContents(event.sender)
-  if (win) win.minimize()
+  BrowserWindow.fromWebContents(event.sender)?.minimize()
 })
 
 ipcMain.on('window-maximize', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender)
-  if (win) {
-    if (win.isMaximized()) win.unmaximize()
-    else win.maximize()
-  }
+  if (!win) return
+  win.isMaximized() ? win.unmaximize() : win.maximize()
 })
 
 ipcMain.on('window-close', (event) => {
-  const win = BrowserWindow.fromWebContents(event.sender)
-  if (win) win.hide()
-})
-
-ipcMain.on('open-board', (event, { id, title }) => {
-  openBoardWindow(id, title)
+  BrowserWindow.fromWebContents(event.sender)?.hide()
 })

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { getBoards, createBoard, deleteBoard } from '../api'
-import Titlebar from './Titlebar'
-import '../styles/tasks.css'
+import { getBoards, createBoard, deleteBoard } from '../../shared/utils/api'
+import Titlebar from '../../shared/components/Titlebar'
+import './tasks.css'
 
 function Tasks() {
   const [boards, setBoards] = useState([])

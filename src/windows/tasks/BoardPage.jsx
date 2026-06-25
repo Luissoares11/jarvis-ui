@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { getBoardTasks, createTask, setTaskDone, deleteTask } from '../api'
-import '../styles/tasks.css'
+import { getBoardTasks, createTask, setTaskDone, deleteTask } from '../../shared/utils/api'
+import './tasks.css'
 
 function BoardCloseBar({ title }) {
   const closeWindow = () => {

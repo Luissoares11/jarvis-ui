@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { resetConfig } from '../config'
-import '../styles/settings.css'
+import { resetConfig } from '../../shared/utils/config'
+import './settings.css'
 
 const { ipcRenderer } = window.require('electron')
 
