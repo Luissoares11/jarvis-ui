@@ -34,6 +34,7 @@ ipcMain.handle('save-config', (event, config) => {
 // To add a new feature window, add one entry here. Nothing else needs to change.
 
 const WINDOW_CONFIG = {
+  chat:      { hash: 'chat',     width: 900, height: 700 },
   calendar:  { hash: 'calendar', width: 900, height: 700 },
   tasks:     { hash: 'tasks',    width: 900, height: 700 },
   settings:     { hash: 'settings', width: 900, height: 700 },

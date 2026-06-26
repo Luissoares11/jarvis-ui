@@ -89,7 +89,7 @@
 }
 
 .widget-label {
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: 3px;
   color: #1e4d6b;
   text-transform: uppercase;
@@ -128,14 +128,14 @@
 }
 
 .event-time {
-  font-size: 10px;
+  font-size: 12px;
   color: #1e4d6b;
   min-width: 38px;
   flex-shrink: 0;
 }
 
 .event-title {
-  font-size: 11px;
+  font-size: 13px;
   color: #70b8f0;
   letter-spacing: 0.5px;
   flex: 1;
@@ -145,7 +145,7 @@
 }
 
 .event-badge {
-  font-size: 8px;
+  font-size: 9px;
   letter-spacing: 1px;
   padding: 2px 5px;
   border: 1px solid #0d2a40;
@@ -182,7 +182,7 @@
 }
 
 .task-text {
-  font-size: 11px;
+  font-size: 12px;
   color: #70b8f0;
   letter-spacing: 0.3px;
   white-space: nowrap;
@@ -193,6 +193,24 @@
 .task-text.done {
   color: #1e4d6b;
   text-decoration: line-through;
+}
+
+.task-board-group {
+  margin-bottom: 8px;
+}
+
+.task-board-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.task-board-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #378ADD;
+  text-transform: uppercase;
+  padding: 4px 0 5px;
+  border-bottom: 1px solid #0a1e30;
+  margin-bottom: 4px;
 }
 
 /* ── Weather ─────────────────────────────────────────────── */
@@ -212,13 +230,13 @@
 }
 
 .weather-cond-main {
-  font-size: 11px;
+  font-size: 13px;
   color: #70b8f0;
   letter-spacing: 0.5px;
 }
 
 .weather-cond-loc {
-  font-size: 9px;
+  font-size: 12px;
   color: #1e4d6b;
   letter-spacing: 1px;
   margin-top: 2px;
@@ -237,17 +255,39 @@
 }
 
 .wk {
-  font-size: 9px;
+  font-size: 12px;
   color: #1e4d6b;
   letter-spacing: 1px;
   text-transform: uppercase;
 }
 
 .wv {
-  font-size: 9px;
+  font-size: 12px;
   color: #70b8f0;
   letter-spacing: 1px;
+  margin-left: 20px;
 }
+
+.weather-location {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.weather-loc-name {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #378ADD;
+  text-transform: uppercase;
+}
+
+.weather-divider {
+  width: 100%;
+  height: 1px;
+  background: #0a1e30;
+  margin: 6px 0;
+}   
 
 /* ── Open buttons ────────────────────────────────────────── */
 
@@ -255,7 +295,7 @@
   margin-top: auto;
   padding-top: 10px;
   font-family: 'Courier New', monospace;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 1px;
   color: #378ADD;
   background: none;
@@ -328,3 +368,4 @@
   color: #1e4d6b;
   text-transform: uppercase;
 }
+

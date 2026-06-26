@@ -30,6 +30,35 @@
   text-transform: uppercase;
 }
 
+.titlebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  margin-right: 16px;
+  -webkit-app-region: no-drag;
+}
+
+.tb-action-btn {
+  background: none;
+  border: 1px solid #0d2a40;
+  border-radius: 3px;
+  color: #1e4d6b;
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  -webkit-app-region: no-drag;
+}
+
+.tb-action-btn:hover {
+  color: #378ADD;
+  border-color: #378ADD;
+}
+
 .titlebar-right {
   display: flex;
   gap: 8px;
@@ -45,14 +74,6 @@
   cursor: pointer;
 }
 
-.tb-btn.min:hover {
-  background: #03f7f7;
-}
-
-.tb-btn.max:hover {
-  background: #f7e603;
-}
-
-.tb-btn.close:hover {
-  background: #c21010;
-}
+.tb-btn.min:hover   { background: #03f7f7; }
+.tb-btn.max:hover   { background: #f7e603; }
+.tb-btn.close:hover { background: #c21010; }

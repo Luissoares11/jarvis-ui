@@ -51,14 +51,21 @@ async function fetchTasks(config) {
 }
 
 async function fetchWeather() {
-  // Open-Meteo — no auth needed
-  const res = await fetch(
-    'https://api.open-meteo.com/v1/forecast?latitude=41.0408&longitude=-8.2716' +
-    '&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m' +
-    '&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
-    '&timezone=Europe%2FLisbon&forecast_days=1'
-  )
-  return res.json()
+  const [castelo, porto] = await Promise.all([
+    fetch(
+      'https://api.open-meteo.com/v1/forecast?latitude=41.03&longitude=-8.27' +
+      '&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m' +
+      '&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
+      '&timezone=Europe%2FLisbon&forecast_days=1'
+    ).then(r => r.json()),
+    fetch(
+      'https://api.open-meteo.com/v1/forecast?latitude=41.15&longitude=-8.61' +
+      '&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m' +
+      '&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
+      '&timezone=Europe%2FLisbon&forecast_days=1'
+    ).then(r => r.json()),
+  ])
+  return { castelo, porto }
 }
 
 const WMO_LABELS = {
@@ -80,30 +87,64 @@ function WidgetLabel({ children, dot = true }) {
   )
 }
 
+const YEARLY_TYPES = ['birthday', 'anniversary']
+ 
+function parseIso(isoString) {
+  const [datePart, timePart = '00:00'] = isoString.split('T')
+  const [year, month, day] = datePart.split('-').map(Number)
+  const [hour, minute]     = timePart.split(':').map(Number)
+  return { year, month: month - 1, day, hour, minute }
+}
+ 
 function EventsWidget({ events }) {
   const now = new Date()
-  const today = events
-    .filter(e => {
-      const d = new Date(e.start_time)
-      return d.toDateString() === now.toDateString()
-    })
-    .slice(0, 4)
-
+  const todayY = now.getFullYear()
+  const todayM = now.getMonth()
+  const todayD = now.getDate()
+ 
+  // Project yearly events into current year, keep one-time as-is
+  const projected = events.flatMap(e => {
+    const p = parseIso(e.start_time)
+    const isYearly = e.recurrence === 'yearly' || YEARLY_TYPES.includes(e.type)
+    if (isYearly) {
+      return [{ ...e, _day: p.day, _month: p.month, _year: todayY, _time: `${pad(p.hour)}:${pad(p.minute)}` }]
+    }
+    return [{ ...e, _day: p.day, _month: p.month, _year: p.year, _time: `${pad(p.hour)}:${pad(p.minute)}` }]
+  })
+ 
+  // Try today first, fall back to rest of this month
+  const todayEvents = projected.filter(e =>
+    e._day === todayD && e._month === todayM && e._year === todayY
+  )
+ 
+  const monthEvents = projected.filter(e =>
+    e._month === todayM && e._year === todayY &&
+    (e._day > todayD || (e._year === todayY && e._month === todayM && e._day > todayD))
+  ).sort((a, b) => a._day - b._day).slice(0, 4)
+ 
+  const showing   = todayEvents.length > 0 ? todayEvents.slice(0, 4) : monthEvents
+  const labelText = todayEvents.length > 0
+    ? 'Daily / Events'
+    : 'This month / Events'
+ 
   return (
     <div className="widget">
-      <WidgetLabel>daily intelligence / events</WidgetLabel>
-      {today.length === 0 && <div className="empty-state">No events today, sir.</div>}
-      {today.map(e => {
-        const d = new Date(e.start_time)
-        const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`
-        return (
-          <div key={e.id} className="event-row">
-            <span className="event-time">{time}</span>
-            <span className="event-title">{e.title}</span>
-            {e.type && <span className="event-badge">{e.type.toUpperCase()}</span>}
-          </div>
-        )
-      })}
+      <WidgetLabel>{labelText}</WidgetLabel>
+      {showing.length === 0 && <div className="empty-state">No upcoming events, sir.</div>}
+      {showing.map((e, i) => (
+        <div key={`${e.id}-${i}`} className="event-row">
+          {todayEvents.length === 0 && (
+            <span className="event-time" style={{ minWidth: 52 }}>
+              {MONTHS[e._month]} {e._day}
+            </span>
+          )}
+          {todayEvents.length > 0 && (
+            <span className="event-time">{e._time}</span>
+          )}
+          <span className="event-title">{e.title}</span>
+          {e.type && <span className="event-badge">{e.type.toUpperCase()}</span>}
+        </div>
+      ))}
       <button className="open-btn" onClick={() => ipcRenderer.send('open-feature', 'calendar')}>
         open calendar ↗
       </button>
@@ -112,18 +153,31 @@ function EventsWidget({ events }) {
 }
 
 function TasksWidget({ tasks }) {
-  const pending = tasks.filter(t => !t.done).slice(0, 5)
-  const done    = tasks.filter(t =>  t.done).slice(0, 2)
-  const shown   = [...pending, ...done].slice(0, 5)
+  // Group by board, only pending
+  const byBoard = tasks
+    .filter(t => !t.done)
+    .reduce((acc, t) => {
+      const key = t.boardTitle || 'General'
+      if (!acc[key]) acc[key] = []
+      acc[key].push(t)
+      return acc
+    }, {})
+
+  const boards = Object.entries(byBoard)
 
   return (
     <div className="widget">
       <WidgetLabel>task queue</WidgetLabel>
-      {shown.length === 0 && <div className="empty-state">No tasks, sir.</div>}
-      {shown.map(t => (
-        <div key={t.id} className="task-row">
-          <div className={`task-dot ${t.done ? 'done' : ''}`} />
-          <span className={`task-text ${t.done ? 'done' : ''}`}>{t.task}</span>
+      {boards.length === 0 && <div className="empty-state">No tasks, sir.</div>}
+      {boards.map(([boardName, boardTasks]) => (
+        <div key={boardName} className="task-board-group">
+          <div className="task-board-label">{boardName}</div>
+          {boardTasks.slice(0, 3).map(t => (
+            <div key={t.id} className="task-row">
+              <div className="task-dot" />
+              <span className="task-text">{t.task}</span>
+            </div>
+          ))}
         </div>
       ))}
       <button className="open-btn" onClick={() => ipcRenderer.send('open-feature', 'tasks')}>
@@ -136,35 +190,47 @@ function TasksWidget({ tasks }) {
 function WeatherWidget({ weather }) {
   if (!weather) return (
     <div className="widget">
-      <WidgetLabel>transit matrix / weather</WidgetLabel>
+      <WidgetLabel>Weather</WidgetLabel>
       <div className="empty-state">Loading weather...</div>
     </div>
   )
 
-  const c  = weather.current
-  const d  = weather.daily
-  const temp   = Math.round(c.temperature_2m)
-  const wind   = Math.round(c.windspeed_10m)
-  const hum    = c.relativehumidity_2m
-  const high   = Math.round(d.temperature_2m_max[0])
-  const low    = Math.round(d.temperature_2m_min[0])
-  const precip = d.precipitation_probability_max[0]
-  const cond   = WMO_LABELS[c.weathercode] || 'Unknown'
+  const fmt = (data, label) => {
+    const c      = data.current
+    const d      = data.daily
+    const temp   = Math.round(c.temperature_2m)
+    const wind   = Math.round(c.windspeed_10m)
+    const high   = Math.round(d.temperature_2m_max[0])
+    const low    = Math.round(d.temperature_2m_min[0])
+    const precip = d.precipitation_probability_max[0]
+    const cond   = WMO_LABELS[c.weathercode] || 'Unknown'
+    return { temp, wind, high, low, precip, cond, label }
+  }
+
+  const cp = fmt(weather.castelo, 'Castelo de Paiva')
+  const po = fmt(weather.porto,   'Porto')
+
+  const Location = ({ w }) => (
+    <div className="weather-location">
+      <div className="weather-loc-name">{w.label}</div>
+      <div className="weather-hero">
+        <span className="weather-temp">{w.temp}°</span>
+        <div>
+          <div className="weather-cond-main">{w.cond}</div>
+          <div className="weather-row"><span className="wk">high / low</span><span className="wv"> {w.high}° / {w.low}°</span></div>
+          <div className="weather-row"><span className="wk">wind</span><span className="wv">{w.wind} km/h</span></div>
+          <div className="weather-row"><span className="wk">rain</span><span className="wv">{w.precip}%</span></div>
+        </div>
+      </div>
+    </div>
+  )
 
   return (
     <div className="widget">
-      <WidgetLabel>transit matrix / weather</WidgetLabel>
-      <div className="weather-hero">
-        <span className="weather-temp">{temp}°</span>
-        <div>
-          <div className="weather-cond-main">{cond}</div>
-          <div className="weather-cond-loc">Castelo de Paiva</div>
-        </div>
-      </div>
-      <div className="weather-row"><span className="wk">wind</span><span className="wv">{wind} km/h</span></div>
-      <div className="weather-row"><span className="wk">humidity</span><span className="wv">{hum}%</span></div>
-      <div className="weather-row"><span className="wk">high / low</span><span className="wv">{high}° / {low}°</span></div>
-      <div className="weather-row"><span className="wk">precipitation</span><span className="wv">{precip}%</span></div>
+      <WidgetLabel>Weather</WidgetLabel>
+      <Location w={cp} />
+      <div className="weather-divider" />
+      <Location w={po} />
     </div>
   )
 }
@@ -258,10 +324,15 @@ function Dashboard() {
 
   return (
     <div className="dash">
-      <Titlebar extra={
-        <button className="settings-btn" onClick={() => ipcRenderer.send('open-feature', 'settings')}>
-          ⚙
-        </button>
+      <Titlebar actions={
+        <>
+          <button className="tb-action-btn" onClick={() => ipcRenderer.send('open-feature', 'chat')}>
+            chat
+          </button>
+          <button className="tb-action-btn" onClick={() => ipcRenderer.send('open-feature', 'settings')}>
+            settings
+          </button>
+        </>
       } />
 
       <div className="clock-zone">

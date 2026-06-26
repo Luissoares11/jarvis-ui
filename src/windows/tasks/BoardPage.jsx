@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getBoardTasks, createTask, setTaskDone, deleteTask } from '../../shared/utils/api'
+import Titlebar from '../../shared/components/Titlebar'
 import './tasks.css'
 
 function BoardCloseBar({ title }) {
@@ -51,7 +52,7 @@ function BoardPage({ boardId, boardTitle }) {
 
   return (
     <div className="page-window">
-      <BoardCloseBar title={boardTitle} />
+      <Titlebar />
       <div className="page">
         <div className="section">
           <div className="page-input-bar">

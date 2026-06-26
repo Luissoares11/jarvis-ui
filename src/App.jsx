@@ -22,10 +22,18 @@ function getBoardParams() {
   return { boardId: params.get('id'), boardTitle: params.get('title') }
 }
 
+function ChatWindow() {
+  const [messages, setMessages] = useState([
+    { role: 'jarvis', text: 'Online and ready, sir.' }
+  ])
+  return <Chat messages={messages} setMessages={setMessages} />
+}
+
 function Router() {
   const hash = window.location.hash
 
   if (hash === '#mini')          return <Mini />
+  if (hash === '#chat')          return <ChatWindow />
   if (hash === '#card')          return <Card />
   if (hash === '#calendar')      return <Calendar standalone />
   if (hash === '#tasks')         return <Tasks standalone />

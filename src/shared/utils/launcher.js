@@ -6,7 +6,7 @@
  * Make sure the matching entry exists in WINDOW_CONFIG in electron.cjs.
  */
 
-const LAUNCHABLE = ['dashboard', 'calendar', 'tasks', 'notes', 'settings']
+const LAUNCHABLE = ['dashboard', 'chat', 'calendar', 'tasks', 'notes', 'settings']
 
 /**
  * Returns the feature name if the text is a launcher command, otherwise null.
