@@ -33,7 +33,6 @@ async function fetchEvents(config) {
 }
 
 async function fetchTasks(config) {
-  // Get all boards, then get tasks for each, flatten
   const res = await fetch(`${config.apiUrl}/boards`, {
     headers: { Authorization: `Bearer ${config.token}` }
   })
@@ -50,20 +49,14 @@ async function fetchTasks(config) {
   return all.flat()
 }
 
-async function fetchWeather() {
+async function fetchWeather(config) {
   const [castelo, porto] = await Promise.all([
-    fetch(
-      'https://api.open-meteo.com/v1/forecast?latitude=41.03&longitude=-8.27' +
-      '&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m' +
-      '&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
-      '&timezone=Europe%2FLisbon&forecast_days=1'
-    ).then(r => r.json()),
-    fetch(
-      'https://api.open-meteo.com/v1/forecast?latitude=41.15&longitude=-8.61' +
-      '&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m' +
-      '&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
-      '&timezone=Europe%2FLisbon&forecast_days=1'
-    ).then(r => r.json()),
+    fetch(`${config.apiUrl}/weather?location=Castelo+de+Paiva&days=1`, {
+      headers: { Authorization: `Bearer ${config.token}` }
+    }).then(r => r.json()),
+    fetch(`${config.apiUrl}/weather?location=Porto&days=1`, {
+      headers: { Authorization: `Bearer ${config.token}` }
+    }).then(r => r.json()),
   ])
   return { castelo, porto }
 }
@@ -202,7 +195,7 @@ function WeatherWidget({ weather }) {
     const wind   = Math.round(c.windspeed_10m)
     const high   = Math.round(d.temperature_2m_max[0])
     const low    = Math.round(d.temperature_2m_min[0])
-    const precip = d.precipitation_probability_max[0]
+    const precip = d.precipitation_sum[0]
     const cond   = WMO_LABELS[c.weathercode] || 'Unknown'
     return { temp, wind, high, low, precip, cond, label }
   }
@@ -219,7 +212,7 @@ function WeatherWidget({ weather }) {
           <div className="weather-cond-main">{w.cond}</div>
           <div className="weather-row"><span className="wk">high / low</span><span className="wv"> {w.high}° / {w.low}°</span></div>
           <div className="weather-row"><span className="wk">wind</span><span className="wv">{w.wind} km/h</span></div>
-          <div className="weather-row"><span className="wk">rain</span><span className="wv">{w.precip}%</span></div>
+          <div className="weather-row"><span className="wk">rain</span><span className="wv">{w.precip} mm</span></div>
         </div>
       </div>
     </div>
@@ -299,16 +292,15 @@ function Dashboard() {
       setApiOnline(online)
 
       if (online) {
-        const [evts, tsks] = await Promise.all([
+        const [evts, tsks, wx] = await Promise.all([
           fetchEvents(config),
           fetchTasks(config),
+          fetchWeather(config),
         ])
         setEvents(evts)
         setTasks(tsks)
+        setWeather(wx)
       }
-
-      const wx = await fetchWeather()
-      setWeather(wx)
 
       setLastSync(new Date())
     } catch (err) {
