@@ -143,23 +143,26 @@ npx electron-builder
 
 ## Roadmap
 
-- [x] Chat interface
-- [x] Live data panels
-- [x] Tasks & reminders page
-- [x] Calendar page
-- [x] Memory browser
-- [x] Settings with persistence
-- [x] Mini mode overlay
-- [x] System tray
-- [x] Interactive plots
-- [x] JSON API endpoints
+- [x] Core memory system — facts, collections, aliases
+- [x] Intelligence layers — conflict detection, pronoun resolution, inference
+- [x] Computation engine — SymPy + plotting
+- [x] External data — weather, football
+- [x] Actions — todos, reminders, timers
+- [x] Calendar — events with type/title schema, recurring (yearly) support
+- [x] Task boards — replacing flat to-do list
+- [x] API server — FastAPI, auth, session context
+- [x] JSON REST endpoints — tasks, events, weather, timers, notifications
 - [x] Integration tests + CI pipeline
-- [X] Event title/type DB schema split
-- [ ] Architecture refactor — launcher-centric UI
-- [ ] Phone UI — React Native (Stage 10)
-- [ ] Voice & device control (Stage 11)
+- [x] Modular `features/` + `routers/` architecture
+- [x] Server deployment — Proxmox VM, systemd, Tailscale
+- [ ] Phone UI — mobile chat interface (Stage 10)
+- [ ] Notes — new feature module, CRUD + REST
+- [ ] Class schedule — new feature module, dashboard widget
+- [ ] Valorant tournament info — external data feature
+- [ ] Voice — Whisper STT, local TTS, wake word (Stage 11)
+- [ ] Device control — smart home, scripts, automations (Stage 11)
 - [ ] Docker — containerized deployment (Stage 12)
-- [ ] Home automation (Stage 13)
+- [ ] Home automation (Stage 13, pending)
 
 ---
 
