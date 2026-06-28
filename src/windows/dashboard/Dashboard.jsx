@@ -318,6 +318,9 @@ function Dashboard() {
     <div className="dash">
       <Titlebar actions={
         <>
+          <button className="tb-action-btn" onClick={refresh}>
+            refresh
+          </button>
           <button className="tb-action-btn" onClick={() => ipcRenderer.send('open-feature', 'chat')}>
             chat
           </button>
