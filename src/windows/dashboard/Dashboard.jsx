@@ -94,8 +94,7 @@ function EventsWidget({ events }) {
   const todayY = now.getFullYear()
   const todayM = now.getMonth()
   const todayD = now.getDate()
- 
-  // Project yearly events into current year, keep one-time as-is
+
   const projected = events.flatMap(e => {
     const p = parseIso(e.start_time)
     const isYearly = e.recurrence === 'yearly' || YEARLY_TYPES.includes(e.type)
@@ -104,22 +103,26 @@ function EventsWidget({ events }) {
     }
     return [{ ...e, _day: p.day, _month: p.month, _year: p.year, _time: `${pad(p.hour)}:${pad(p.minute)}` }]
   })
- 
-  // Try today first, fall back to rest of this month
+
   const todayEvents = projected.filter(e =>
     e._day === todayD && e._month === todayM && e._year === todayY
   )
- 
-  const monthEvents = projected.filter(e =>
-    e._month === todayM && e._year === todayY &&
-    (e._day > todayD || (e._year === todayY && e._month === todayM && e._day > todayD))
-  ).sort((a, b) => a._day - b._day).slice(0, 4)
- 
-  const showing   = todayEvents.length > 0 ? todayEvents.slice(0, 4) : monthEvents
+
+  const todayDate = new Date(todayY, todayM, todayD)
+  const in30Days = new Date(todayDate)
+  in30Days.setDate(in30Days.getDate() + 30)
+
+  const upcomingEvents = projected
+    .map(e => ({ ...e, _date: new Date(e._year, e._month, e._day) }))
+    .filter(e => e._date > todayDate && e._date <= in30Days)
+    .sort((a, b) => a._date - b._date)
+    .slice(0, 9)
+
+  const showing   = todayEvents.length > 0 ? todayEvents.slice(0, 9) : upcomingEvents
   const labelText = todayEvents.length > 0
     ? 'Daily / Events'
-    : 'This month / Events'
- 
+    : 'Next 30 days / Events'
+
   return (
     <div className="widget">
       <WidgetLabel>{labelText}</WidgetLabel>
@@ -127,8 +130,8 @@ function EventsWidget({ events }) {
       {showing.map((e, i) => (
         <div key={`${e.id}-${i}`} className="event-row">
           {todayEvents.length === 0 && (
-            <span className="event-time" style={{ minWidth: 52 }}>
-              {MONTHS[e._month]} {e._day}
+            <span className="event-time" style={{ minWidth: 90 }}>
+              {MONTHS[e._month]} {e._day}, {e._time}
             </span>
           )}
           {todayEvents.length > 0 && (
@@ -165,7 +168,7 @@ function TasksWidget({ tasks }) {
       {boards.map(([boardName, boardTasks]) => (
         <div key={boardName} className="task-board-group">
           <div className="task-board-label">{boardName}</div>
-          {boardTasks.slice(0, 3).map(t => (
+          {boardTasks.slice(0, 99).map(t => (
             <div key={t.id} className="task-row">
               <div className="task-dot" />
               <span className="task-text">{t.task}</span>
