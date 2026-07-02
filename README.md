@@ -154,14 +154,15 @@ npx electron-builder
 - [x] JSON REST endpoints — tasks, events, weather, timers, notifications
 - [x] Integration tests + CI pipeline
 - [x] Modular `features/` + `routers/` architecture
-- [x] Server deployment — Proxmox VM, systemd, Tailscale
+- [x] Docker — containerized backend deployment (Stage 12)
+- [x] Server deployment — Proxmox VM, Docker Compose, Tailscale
+- [x] CI/CD — automated test → Tailscale connect → SSH deploy on push to `main`
 - [ ] Phone UI — mobile chat interface (Stage 10)
 - [ ] Notes — new feature module, CRUD + REST
 - [ ] Class schedule — new feature module, dashboard widget
 - [ ] Valorant tournament info — external data feature
 - [ ] Voice — Whisper STT, local TTS, wake word (Stage 11)
 - [ ] Device control — smart home, scripts, automations (Stage 11)
-- [ ] Docker — containerized deployment (Stage 12)
 - [ ] Home automation (Stage 13, pending)
 
 ---
